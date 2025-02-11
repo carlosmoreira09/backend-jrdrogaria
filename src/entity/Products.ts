@@ -20,5 +20,5 @@ export class Products {
     stock!: string
 
     @ManyToOne(() => Tenant, tenant => tenant.products, { nullable: true })
-    tenants!: Tenant;
+    tenants?: Tenant;
 }

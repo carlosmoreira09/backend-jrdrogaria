@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { errorResponse } from '../utils/httpResponses';
 
 export const isAdminMiddleware = (req: Request, res: Response, next: NextFunction) => {
     if (req.user?.role == 'supplier') {
-        return errorResponse(res, new Error('Acesso negado: Apenas administradores podem realizar esta ação'), 403);
+        return res.send('Acesso negado: Apenas administradores podem realizar esta ação').status(403);
     }
     next();
 };

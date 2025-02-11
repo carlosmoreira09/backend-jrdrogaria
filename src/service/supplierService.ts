@@ -3,7 +3,7 @@ import {tenantRepository} from "../repository/tenantRepository";
 import {supplierRepository} from "../repository/supplierRepository";
 import {Supplier} from "../entity/Supplier";
 
-export const findProductById = async (id: number, tenantId: number) => {
+export const findProductById = async (id: number) => {
     return await supplierRepository.findOne({ where: {
             id: id
         },
@@ -11,19 +11,14 @@ export const findProductById = async (id: number, tenantId: number) => {
     })
 }
 
-export const listSupplierService = async (tenantID: number) => {
+export const listSupplierService = async () => {
     return await supplierRepository.find()
 }
 
-export const createSupplierService = async(supplier: Supplier, tenantID: number) => {
-    const tenant = await tenantRepository.findOne({ where: {
-            id: tenantID
-        }});
-    if(!tenant) {
-        throw new Error('Tenant não encontrado')
-    }
+export const createSupplierService = async(supplier: Supplier) => {
+
     const newSupplier = supplierRepository.create(supplier)
-    await productsRepository.save(newSupplier)
+    await supplierRepository.save(newSupplier)
     return { message: 'Fornecedor adicionado'}
 }
 

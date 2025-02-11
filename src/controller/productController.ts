@@ -73,7 +73,7 @@ export const deleteProductController = async (req: Request, res: Response) => {
 
     try {
         const id_product = req.params.id
-        const result = await deleteProdutoService(parseInt(id_product))
+        const result = await deleteProdutoService(parseInt(id_product as string))
         res.send( { data: result, message: 'Produto deletado.' }).status(200)
     } catch (error) {
         res.send({ error: error }).status(400)

@@ -9,13 +9,9 @@ import {
 import {Supplier} from "../entity/Supplier";
 
 export const listSupplierController = async (req: Request, res: Response) => {
-    const tenantId = req.tenantId as number
-    if(!tenantId) {
-        throw new Error('Tenant não encontrado')
-    }
 
     try {
-        const result = await listSupplierService(tenantId)
+        const result = await listSupplierService()
         res.send( { data: result, message: 'Lista de Fornecedores.' }).status(200)
     } catch (error) {
         res.send({ error: error }).status(400)
@@ -23,14 +19,11 @@ export const listSupplierController = async (req: Request, res: Response) => {
 }
 
 export const createSupplierController = async (req: Request, res: Response) => {
-    const tenantId = req.tenantId as number
-    if(!tenantId) {
-        throw new Error('Tenant não encontrado')
-    }
+
     try {
         const supplierData: Supplier = req.body;
 
-        const result = await createSupplierService(supplierData, tenantId)
+        const result = await createSupplierService(supplierData)
 
         res.send( { data: result, message: 'Fornecedor cadastrado.' }).status(201)
     } catch (error) {

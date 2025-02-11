@@ -24,6 +24,9 @@ export class Supplier {
     @Column()
     payment_mode!: string
 
+    @Column({ nullable: true})
+    whatsAppNumber!: string;
+
     @Column()
     payment_term!: string
 

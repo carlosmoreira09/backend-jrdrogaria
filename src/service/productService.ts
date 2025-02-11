@@ -34,7 +34,7 @@ export const createProductService = async(product: Products, tenantID: number) =
     }
     const newProduct = productsRepository.create({
         ...product,
-        tenants: [tenant]
+        tenants: tenant
     })
     await productsRepository.save(newProduct)
     return { message: 'Produto adicionado'}
@@ -49,5 +49,7 @@ export const updateProductService = async (product: Products, tenantID: number) 
 }
 
 export const deleteProdutoService = async (id_product: number) => {
-    return await productsRepository.delete({id: id_product})
+    const result = await productsRepository.delete({id: id_product})
+    console.log(result)
+    return result
 }

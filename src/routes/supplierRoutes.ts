@@ -11,9 +11,9 @@ import {
 
 
 const router = Router();
-router.post('/', tenantMiddleware, createSupplierController)
-router.get('/', tenantMiddleware, listSupplierController)
-router.put('/', tenantMiddleware, updateSupplierController )
-router.delete('/:id', tenantMiddleware, deleteSupplierController)
-router.get('/:id', tenantMiddleware, getSupplierDetailsController)
+router.post('/', createSupplierController)
+router.get('/', listSupplierController)
+router.put('/', updateSupplierController )
+router.delete('/:id', deleteSupplierController)
+router.get('/:id', getSupplierDetailsController)
 export default router
