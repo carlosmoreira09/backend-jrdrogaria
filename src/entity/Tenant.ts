@@ -20,8 +20,7 @@ export class Tenant {
     @OneToMany(() => Users, user => user.tenants)
     admins!: Users[];
 
-    @ManyToMany(() => Products, product => product.tenants, { nullable: true })
-    @JoinTable()
+    @OneToMany(() => Products, product => product.tenants, { nullable: true })
     products!: Products[];
 
     @CreateDateColumn()

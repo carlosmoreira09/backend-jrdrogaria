@@ -2,7 +2,7 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
-    Index, ManyToMany, JoinTable,
+    Index, ManyToMany, JoinTable, ManyToOne,
 } from 'typeorm';
 import {Tenant} from "./Tenant";
 
@@ -19,7 +19,6 @@ export class Products {
     @Column()
     stock!: string
 
-    @ManyToMany(() => Tenant, tenant => tenant.products, { nullable: true })
-    @JoinTable()
-    tenants!: Tenant[];
+    @ManyToOne(() => Tenant, tenant => tenant.products, { nullable: true })
+    tenants!: Tenant;
 }
