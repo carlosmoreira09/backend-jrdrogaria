@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { successResponse, errorResponse } from '../utils/httpResponses';
 import {Users} from "../entity/Users";
 import {loginAdmin, registerAdmin} from "../service/authService";
 import {LoginAdminDTO} from "../types/enums/auth/auth";
@@ -19,9 +18,9 @@ export const registerAdminController = async (req: Request, res: Response) => {
             parseInt(tenantId)
         );
 
-        res.send(successResponse(res, result, 'Users registrado com sucesso', 201))
+        res.send( { data: result, message: 'Usuário registrado com sucesso.' }).status(201)
     } catch (error) {
-        res.send(errorResponse(res, error))
+        res.send({ error: error }).status(400)
     }
 };
 
@@ -37,9 +36,9 @@ export const loginController = async (req: Request, res: Response) => {
 
         const result = await loginAdmin(loginData);
 
-        res.send(successResponse(res, { token: result.token }, 'Login realizado com sucesso.'))
+        res.send( { token: result.token, message: 'Login realizado com sucesso.' }).status(200)
     } catch (error) {
-        res.send(errorResponse(res, error, 401))
+        res.status(401)
     }
 };
 

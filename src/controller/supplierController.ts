@@ -1,13 +1,12 @@
 import { Request, Response } from 'express';
-import { successResponse, errorResponse } from '../utils/httpResponses';
 import {
     createSupplierService,
-    deleteSupplierService, findSupplierById,
+    deleteSupplierService,
+    findSupplierById,
     listSupplierService,
     updateSupplierService
 } from "../service/supplierService";
 import {Supplier} from "../entity/Supplier";
-import {findProductById} from "../service/productService";
 
 export const listSupplierController = async (req: Request, res: Response) => {
     const tenantId = req.tenantId as number
@@ -17,9 +16,9 @@ export const listSupplierController = async (req: Request, res: Response) => {
 
     try {
         const result = await listSupplierService(tenantId)
-        res.send(successResponse(res, result, 'Listagem de produtos', 200))
+        res.send( { data: result, message: 'Lista de Fornecedores.' }).status(200)
     } catch (error) {
-        res.send(errorResponse(res, error))
+        res.send({ error: error }).status(400)
     }
 }
 
@@ -33,9 +32,9 @@ export const createSupplierController = async (req: Request, res: Response) => {
 
         const result = await createSupplierService(supplierData, tenantId)
 
-        res.send(successResponse(res, result, 'Produto cadastrado', 201))
+        res.send( { data: result, message: 'Fornecedor cadastrado.' }).status(201)
     } catch (error) {
-        res.send(errorResponse(res, error))
+        res.send({ error: error }).status(400)
     }
 }
 
@@ -50,9 +49,9 @@ export const updateSupplierController = async (req: Request, res: Response) => {
 
         const result = await updateSupplierService(supplierData)
 
-        res.send(successResponse(res, result, 'Produto atualizado', 201))
+        res.send( { data: result, message: 'Fornecedor atualizado.' }).status(200)
     } catch (error) {
-        res.send(errorResponse(res, error))
+        res.send({ error: error }).status(400)
     }
 }
 export const deleteSupplierController = async (req: Request, res: Response) => {
@@ -64,9 +63,9 @@ export const deleteSupplierController = async (req: Request, res: Response) => {
     try {
         const id_product = req.params.id
         const result = await deleteSupplierService(parseInt(id_product))
-        res.send(successResponse(res, result, 'Produto removido', 200))
+        res.send( { data: result, message: 'Fornecedor removido.' }).status(200)
     } catch (error) {
-        res.send(errorResponse(res, error))
+        res.send({ error: error }).status(400)
     }
 }
 
@@ -74,8 +73,8 @@ export const getSupplierDetailsController = async (req: Request, res: Response) 
     try {
         const id_product = req.params.id as string
         const result = await findSupplierById(parseInt(id_product));
-        res.send(successResponse(res, result, 'Listagem de produtos', 200))
+        res.send( { data: result, message: 'Dados do Fornecedor.' }).status(200)
     } catch (error) {
-        res.send(errorResponse(res, error))
+        res.send({ error: error }).status(400)
     }
 }

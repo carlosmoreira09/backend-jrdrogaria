@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { successResponse, errorResponse } from '../utils/httpResponses';
 import {
     createProductService,
     deleteProdutoService, findProductById,
@@ -16,9 +15,9 @@ export const listProductsController = async (req: Request, res: Response) => {
 
     try {
         const result = await listProductsService(tenantId)
-        res.send(successResponse(res, result, 'Listagem de produtos', 200))
+        res.send( { data: result, message: 'Lista de Produtos.' }).status(200)
     } catch (error) {
-        res.send(errorResponse(res, error))
+        res.send({ error: error }).status(400)
     }
 }
 export const getProductDetailsController = async (req: Request, res: Response) => {
@@ -29,9 +28,9 @@ export const getProductDetailsController = async (req: Request, res: Response) =
     try {
         const id_product = req.params.id as string
         const result = await findProductById(parseInt(id_product), tenantId);
-        res.send(successResponse(res, result, 'Listagem de produtos', 200))
+        res.send( { data: result, message: 'Detalhe do Produto.' }).status(200)
     } catch (error) {
-        res.send(errorResponse(res, error))
+        res.send({ error: error }).status(400)
     }
 }
 export const createProductController = async (req: Request, res: Response) => {
@@ -44,9 +43,9 @@ export const createProductController = async (req: Request, res: Response) => {
 
         const result = await createProductService(productData, tenantId)
 
-        res.send(successResponse(res, result, 'Produto cadastrado', 201))
+        res.send( { data: result, message: 'Produto cadastrado.' }).status(201)
     } catch (error) {
-        res.send(errorResponse(res, error))
+        res.send({ error: error }).status(400)
     }
 }
 
@@ -61,9 +60,9 @@ export const updateProductController = async (req: Request, res: Response) => {
 
         const result = await updateProductService(productData, tenantId)
 
-        res.send(successResponse(res, result, 'Produto atualizado', 201))
+        res.send( { data: result, message: 'Produto atualizado.' }).status(200)
     } catch (error) {
-        res.send(errorResponse(res, error))
+        res.send({ error: error }).status(400)
     }
 }
 export const deleteProductController = async (req: Request, res: Response) => {
@@ -75,8 +74,8 @@ export const deleteProductController = async (req: Request, res: Response) => {
     try {
         const id_product = req.params.id
         const result = await deleteProdutoService(parseInt(id_product))
-        res.send(successResponse(res, result, 'Produto removido', 200))
+        res.send( { data: result, message: 'Produto deletado.' }).status(200)
     } catch (error) {
-        res.send(errorResponse(res, error))
+        res.send({ error: error }).status(400)
     }
 }

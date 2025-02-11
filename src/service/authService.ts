@@ -43,10 +43,8 @@ export const loginAdmin = async (loginData: LoginAdminDTO): Promise<any>  => {
 
     const token = generateToken(user.id, user.role, tenants[0].id, tenants[0].name);
     user.sessionToken = token;
-    console.log('teste2')
 
-
-    return { multipleTenants: false, token };
+    return { token };
 };
 
 
