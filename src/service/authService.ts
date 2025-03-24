@@ -7,7 +7,7 @@ import {Users} from "../entity/Users";
 import {LoginAdminDTO} from "../types/enums/auth/auth";
 
 const findAdminByEmail = async (email: string): Promise<Users | null> => {
-    return await usersRepository.findOne({where: {email}, relations: ['tenants']});
+    return await usersRepository.findOne({where: { email: email }, relations: ['tenants']});
 };
 export const getAdminById = async (adminID: number): Promise<Users | null> => {
     return await usersRepository.findOne({ where: { id: adminID }, relations: ['tenants'] });
@@ -23,7 +23,7 @@ export const registerAdmin = async (adminData: Users, tenantId: number): Promise
     const newAdmin = usersRepository.create({
         ...adminData,
         password: hashedPassword,
-        tenants: [tenant]
+        tenants: tenant
     });
     try {
         const result = await usersRepository.save(newAdmin);
@@ -36,12 +36,12 @@ export const registerAdmin = async (adminData: Users, tenantId: number): Promise
 export const loginAdmin = async (loginData: LoginAdminDTO): Promise<any>  => {
     let user: Users | null = await findAdminByEmail(loginData.user)
     if (!user) throw new Error('Usuário não encontrado');
-
     const isPasswordValid = await bcrypt.compare(loginData.password, user.password);
     if (!isPasswordValid) throw new Error('Senha inválida');
     const tenants = user.tenants;
-
-    const token = generateToken(user.id, user.role, tenants[0].id, tenants[0].name);
+    console.log(tenants)
+    const token = generateToken(user.id, user.role, tenants.id, tenants.name);
+    console.log(token)
     user.sessionToken = token;
 
     return { token };

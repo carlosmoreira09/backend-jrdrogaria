@@ -5,7 +5,7 @@ import {
     CreateDateColumn,
     Index,
     DeleteDateColumn,
-    ManyToMany, JoinTable
+    ManyToMany, JoinTable, ManyToOne
 } from 'typeorm';
 import { Tenant } from './Tenant';
 
@@ -36,9 +36,9 @@ export class Users {
     @CreateDateColumn()
     created_at!: Date;
 
-    @ManyToMany(() => Tenant, tenant => tenant.admins, { nullable: true })
+    @ManyToOne(() => Tenant, tenant => tenant.admins, { nullable: true })
     @JoinTable()
-    tenants!: Tenant[];
+    tenants!: Tenant;
 
     @DeleteDateColumn()
     delete_at?: Date;

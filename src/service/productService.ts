@@ -14,11 +14,11 @@ export const findProductById = async (id: number, tenantId: number) => {
     })
 }
 
-export const listProductsService = async (tenantID: number) => {
+export const listProductsService = async (id_store: number) => {
     return await productsRepository.find({
     where: {
         tenants: {
-            id: tenantID
+            id: id_store
         }
     },
         relations: ['tenants']
@@ -49,7 +49,5 @@ export const updateProductService = async (product: Products, tenantID: number) 
 }
 
 export const deleteProdutoService = async (id_product: number) => {
-    const result = await productsRepository.delete({id: id_product})
-    console.log(result)
-    return result
+    return await productsRepository.delete({id: id_product})
 }
