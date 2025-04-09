@@ -17,7 +17,7 @@ export class Tenant {
     @Column()
     whatsAppNumber!: string;
 
-    @OneToMany(() => Users, user => user.tenants)
+    @OneToMany(() => Users, user => user.tenants, { nullable: true })
     admins!: Users[];
 
     @OneToMany(() => Products, product => product.tenants, { nullable: true })
