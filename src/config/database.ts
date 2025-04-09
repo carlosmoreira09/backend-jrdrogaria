@@ -1,7 +1,11 @@
 import { DataSource } from 'typeorm';
 
 import dotenv from 'dotenv';
-
+import {Users} from "../entity/Users";
+import {Products} from "../entity/Products";
+import {ShoppingList} from "../entity/ShoppingList";
+import {Supplier} from "../entity/Supplier";
+import {Tenant} from "../entity/Tenant";
 
 dotenv.config();
 
@@ -13,8 +17,11 @@ export const AppDataSource = new DataSource({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     entities: [
-        __dirname + '/../entity/*.ts',
-    ],
+        Users,
+        Products,
+        ShoppingList,
+        Supplier,
+        Tenant],
     synchronize: true,
     logging: true,
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
