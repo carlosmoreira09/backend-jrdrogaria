@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import {Users} from "../entity/Users";
 import {loginAdmin, registerAdmin} from "../service/authService";
-import {LoginAdminDTO} from "../types/enums/auth/auth";
+import {LoginAdminDTO} from "../schemas/auth/auth";
 
 export const registerAdminController = async (req: Request, res: Response) => {
     /*

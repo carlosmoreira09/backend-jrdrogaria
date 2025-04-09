@@ -4,7 +4,7 @@ import {ILike} from "typeorm";
 import {usersRepository} from "../repository/usersRepository";
 import {tenantRepository} from "../repository/tenantRepository";
 import {Users} from "../entity/Users";
-import {LoginAdminDTO} from "../types/enums/auth/auth";
+import {LoginAdminDTO} from "../schemas/auth/auth";
 
 const findAdminByEmail = async (email: string): Promise<Users | null> => {
     return await usersRepository.findOne({where: { email: email }, relations: ['tenants']});
