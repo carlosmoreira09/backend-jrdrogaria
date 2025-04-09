@@ -1,6 +1,7 @@
 import {productsRepository} from "../repository/productsRepository";
 import {Products} from "../entity/Products";
 import {tenantRepository} from "../repository/tenantRepository";
+import {shoppingListRepository} from "../repository/shoppingListRepository";
 
 
 export const findProductById = async (id: number, tenantId: number) => {
@@ -50,4 +51,8 @@ export const updateProductService = async (product: Products, tenantID: number) 
 
 export const deleteProdutoService = async (id_product: number) => {
     return await productsRepository.delete({id: id_product})
+}
+export const countProductService = async (id_store: number) => {
+    return await productsRepository.count({ where: { tenants: { id: id_store}}, relations: ['tenants']})
+
 }

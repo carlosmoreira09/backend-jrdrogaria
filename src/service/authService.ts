@@ -35,13 +35,15 @@ export const registerAdmin = async (adminData: Users, tenantId: number): Promise
 
 export const loginAdmin = async (loginData: LoginAdminDTO): Promise<any>  => {
     let user: Users | null = await findAdminByEmail(loginData.user)
-    if (!user) throw new Error('Usuário não encontrado');
+    if (!user) {
+        throw new Error('Usuário não encontrado')
+    }
     const isPasswordValid = await bcrypt.compare(loginData.password, user.password);
-    if (!isPasswordValid) throw new Error('Senha inválida');
+    if (!isPasswordValid) {
+        throw new Error('Senha inválida')
+    }
     const tenants = user.tenants;
-    console.log(tenants)
     const token = generateToken(user.id, user.role, tenants.id, tenants.name);
-    console.log(token)
     user.sessionToken = token;
 
     return { token };

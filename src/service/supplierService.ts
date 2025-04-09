@@ -1,5 +1,4 @@
-import {productsRepository} from "../repository/productsRepository";
-import {tenantRepository} from "../repository/tenantRepository";
+
 import {supplierRepository} from "../repository/supplierRepository";
 import {Supplier} from "../entity/Supplier";
 
@@ -46,4 +45,9 @@ export const findSupplierById = async (id: number) => {
         },
         relations: ['tenants']
     })
+}
+
+export const countSupplier = async (id_store: number) => {
+    return await supplierRepository.count({ withDeleted: false })
+
 }

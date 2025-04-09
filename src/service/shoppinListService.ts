@@ -43,3 +43,7 @@ export const getShoppingListDetailService = async(id_list: number, id_store: num
         }
     })
 }
+
+export const countShoppingListService = async (id_store: number) => {
+    return await shoppingListRepository.count({ where: { tenants: { id: id_store}}, relations: ['tenants']})
+}

@@ -33,12 +33,10 @@ export const loginController = async (req: Request, res: Response) => {
      */
     try {
         const loginData: LoginAdminDTO = req.body;
-
         const result = await loginAdmin(loginData);
-
         res.send( { token: result.token, message: 'Login realizado com sucesso.' }).status(200)
     } catch (error) {
-        res.status(401)
+        res.sendStatus(401)
     }
 };
 

@@ -6,6 +6,7 @@ import shoppingListRoutes from "./routes/shoppingListRoutes";
 import supplierRoutes from "./routes/supplierRoutes";
 import productRoutes from "./routes/productRoutes";
 import authRoutes from "./routes/authRoutes";
+import generalRoutes from "./routes/generalRoutes";
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/suppliers', supplierRoutes);
 app.use('/api/v1/shopping', shoppingListRoutes);
-
+app.use('/api/v1/general', generalRoutes);
 
 
 export default app;
