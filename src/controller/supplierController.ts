@@ -33,10 +33,6 @@ export const createSupplierController = async (req: Request, res: Response) => {
 
 
 export const updateSupplierController = async (req: Request, res: Response) => {
-    const tenantId = req.tenantId as number
-    if(!tenantId) {
-        throw new Error('Tenant não encontrado')
-    }
     try {
         const supplierData: Supplier = req.body;
 
@@ -48,11 +44,6 @@ export const updateSupplierController = async (req: Request, res: Response) => {
     }
 }
 export const deleteSupplierController = async (req: Request, res: Response) => {
-    const tenantId = req.tenantId as number
-    if(!tenantId) {
-        throw new Error('Tenant não encontrado')
-    }
-
     try {
         const id_product = req.params.id
         const result = await deleteSupplierService(parseInt(id_product))

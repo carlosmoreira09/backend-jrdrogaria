@@ -7,8 +7,7 @@ import supplierRoutes from "./routes/supplierRoutes";
 import productRoutes from "./routes/productRoutes";
 import authRoutes from "./routes/authRoutes";
 import generalRoutes from "./routes/generalRoutes";
-import {tenantMiddleware} from "./middlewares/tenantMiddleware";
-import {authMiddleware} from "./middlewares/authMiddleware";
+
 
 dotenv.config();
 
