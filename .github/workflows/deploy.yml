@@ -1,0 +1,29 @@
+name: Deploy Backend to VPS
+
+on:
+  push:
+    branches:
+      - main  # Ou a branch que você usa para deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Criar arquivo de chave SSH
+        run: |
+          echo "${{ secrets.CARLOS }}" > key.pem
+          chmod 400 key.pem
+
+      - name: Deploy para VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem root@172.235.150.164 << 'EOF'
+            cd /var/www/backend-jrdrogaria
+            git pull origin main  # Atualiza o código
+            npm install  # Instala dependências
+            npm run build  # Compila o TypeScript (gera a pasta dist)
+            pm2 restart backend --name "backend" --interpreter node -- dist/index.js
+          EOF
