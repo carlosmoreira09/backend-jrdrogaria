@@ -1,5 +1,5 @@
 import {shoppingListRepository} from "../repository/shoppingListRepository";
-import {ShoppingList} from "../entity/ShoppingList";
+import {ProductData, ShoppingList} from "../entity/ShoppingList";
 import {tenantRepository} from "../repository/tenantRepository";
 
 export const listShoppingListService = async (id_store: number) => {
@@ -13,16 +13,17 @@ export const listShoppingListService = async (id_store: number) => {
     })
 }
 
-export const createShoppingListService = async (newList: ShoppingList, id_store: number) => {
+export const createShoppingListService = async (newList: { list_name: string, products: ProductData[] } , id_store: number) => {
 
    try {
-       const tenant = await tenantRepository.findOne({where: {id: id_store}})
-       if(tenant) {
-           const list: ShoppingList = {...newList, tenants: tenant}
-           const listShopping = shoppingListRepository.create({...newList, tenants: tenant})
+
+           const listShopping = shoppingListRepository.create({...newList, tenants: {
+               id: id_store
+               }})
+       console.log(listShopping)
           const result =  await shoppingListRepository.save(listShopping)
+
            return { data: result, message: 'Lista criada' }
-       }
 
    } catch (error) {
        throw  new Error('Erro ao criar lista')

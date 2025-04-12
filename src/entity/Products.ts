@@ -18,13 +18,10 @@ export class Products {
     @Column()
     product_name!: string
 
-    @Column({ nullable: true })
-    last_price?: string
-
-    @Column({ nullable: true })
-    stock?: string
-
-    @ManyToOne(() => ShoppingList, list => list.products)
+    @ManyToOne(() => ShoppingList, list => list.products,
+        {
+            nullable: true
+        })
     @JoinColumn({
         name:"shoppinglistID"
     })

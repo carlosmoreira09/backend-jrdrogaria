@@ -5,12 +5,12 @@ import {
     CreateDateColumn,
     Index,
     DeleteDateColumn,
-    ManyToMany, JoinTable, ManyToOne
+    JoinTable, ManyToOne
 } from 'typeorm';
 import { Tenant } from './Tenant';
 
 @Entity()
-@Index(['id', 'cpf', 'fullName'])
+@Index(['id', 'fullName'])
 export class Users {
     @PrimaryGeneratedColumn()
     id!: number;
@@ -21,17 +21,11 @@ export class Users {
     @Column()
     fullName!: string;
 
-    @Column({ unique: true })
-    cpf!: string;
-
     @Column()
     password!: string;
 
     @Column({ nullable: false })
     role!: string;
-
-    @Column({ nullable: true })
-    sessionToken?: string;
     
     @CreateDateColumn()
     created_at!: Date;

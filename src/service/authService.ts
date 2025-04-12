@@ -44,8 +44,6 @@ export const loginAdmin = async (loginData: LoginAdminDTO): Promise<any>  => {
     }
     const tenants = user.tenants;
     const token = generateToken(user.id, user.role, tenants.id, tenants.name);
-    user.sessionToken = token;
-    await usersRepository.save(user);
     return { token };
 };
 
@@ -54,12 +52,6 @@ export const getAdmins = async (tenantId: number) => {
     return await usersRepository.find({
         where: { tenants: { id: tenantId } },
         relations: ['tenants'],
-    });
-};
-
-export const getAdminByCPF = async (cpf: string) => {
-    return await usersRepository.findOne({
-        where: { cpf }
     });
 };
 

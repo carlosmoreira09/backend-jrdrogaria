@@ -4,7 +4,7 @@ import {
     deleteShoppingListService, getShoppingListDetailService,
     listShoppingListService
 } from "../service/shoppinListService";
-import {ShoppingList} from "../entity/ShoppingList";
+import {ProductData, ShoppingList} from "../entity/ShoppingList";
 
 export const listShoppingListController = async (req: Request, res: Response) => {
     const tenantId = req.tenantId as number
@@ -24,8 +24,9 @@ export const createShoppingListController = async (req: Request, res: Response) 
         throw new Error('Tenant não encontrado')
     }
     try {
-        const shoppingListData: ShoppingList = req.body;
+        const shoppingListData: { list_name: string, products: ProductData[] } = req.body;
 
+            console.log(shoppingListData)
         const result = await createShoppingListService(shoppingListData,tenantId)
 
         res.send( { data: result, message: 'Lista cadastrada.' }).status(201)

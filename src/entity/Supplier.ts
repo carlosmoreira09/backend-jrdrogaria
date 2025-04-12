@@ -7,22 +7,13 @@ import {
 
 
 @Entity()
-@Index(['id', 'supplier_name', 'cnpj'])
+@Index(['id', 'supplier_name'])
 export class Supplier {
     @PrimaryGeneratedColumn()
     id!: number;
 
     @Column()
     supplier_name!: string
-
-    @Column()
-    cnpj!: string;
-
-    @Column()
-    email!: string;
-
-    @Column()
-    payment_mode!: string
 
     @Column({ nullable: true})
     whatsAppNumber!: string;

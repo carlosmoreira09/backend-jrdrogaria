@@ -7,12 +7,14 @@ import {
     ManyToOne,
     OneToMany,
     OneToOne,
-    PrimaryGeneratedColumn
+    PrimaryGeneratedColumn, UpdateDateColumn
 } from "typeorm";
-import {Products} from "./Products";
-import {Supplier} from "./Supplier";
-import {Tenant} from "./Tenant";
 
+import {Tenant} from "./Tenant";
+export interface ProductData {
+    product: string;
+    stock: number;
+}
 @Entity()
 @Index(['id'])
 export class ShoppingList {
@@ -23,20 +25,17 @@ export class ShoppingList {
     @Column()
     list_name!: string;
 
-    @ManyToOne(() => Products, products => products.id)
-    products!: Products;
-
-    @ManyToOne(() => Supplier, supplier => supplier.id, { nullable: true })
-    supplier?: Supplier;
-
-    @Column('decimal', { precision: 10, scale: 2, nullable: true })
-    supplier_price!: number;
+    @Column({ type: 'json', nullable: true })
+    products?: ProductData[]
 
     @ManyToOne(() => Tenant, tenant => tenant.products, { nullable: true })
     tenants?: Tenant;
 
     @CreateDateColumn()
     created_at!: Date;
+
+    @UpdateDateColumn()
+    update_at!: Date;
 
     @DeleteDateColumn()
     delete_at?: Date;
