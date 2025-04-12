@@ -14,7 +14,7 @@ export const listSupplierController = async (req: Request, res: Response) => {
         const result = await listSupplierService()
         res.send( { data: result, message: 'Lista de Fornecedores.' }).status(200)
     } catch (error) {
-        res.send({ error: error }).status(400)
+        res.sendStatus(400)
     }
 }
 
@@ -27,7 +27,7 @@ export const createSupplierController = async (req: Request, res: Response) => {
 
         res.send( { data: result, message: 'Fornecedor cadastrado.' }).status(201)
     } catch (error) {
-        res.send({ error: error }).status(400)
+        res.sendStatus(400)
     }
 }
 
@@ -44,7 +44,7 @@ export const updateSupplierController = async (req: Request, res: Response) => {
 
         res.send( { data: result, message: 'Fornecedor atualizado.' }).status(200)
     } catch (error) {
-        res.send({ error: error }).status(400)
+        res.sendStatus(400)
     }
 }
 export const deleteSupplierController = async (req: Request, res: Response) => {
@@ -58,7 +58,7 @@ export const deleteSupplierController = async (req: Request, res: Response) => {
         const result = await deleteSupplierService(parseInt(id_product))
         res.send( { data: result, message: 'Fornecedor removido.' }).status(200)
     } catch (error) {
-        res.send({ error: error }).status(400)
+        res.sendStatus(400)
     }
 }
 
@@ -68,6 +68,6 @@ export const getSupplierDetailsController = async (req: Request, res: Response) 
         const result = await findSupplierById(parseInt(id_product));
         res.send( { data: result, message: 'Dados do Fornecedor.' }).status(200)
     } catch (error) {
-        res.send({ error: error }).status(400)
+        res.sendStatus(400)
     }
 }

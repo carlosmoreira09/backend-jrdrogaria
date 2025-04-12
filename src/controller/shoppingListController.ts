@@ -15,8 +15,7 @@ export const listShoppingListController = async (req: Request, res: Response) =>
         const result = await listShoppingListService(tenantId)
         res.send( { data: result, message: 'Lista de Produtos.' }).status(200)
     } catch (error) {
-        res.send({ error: error }).status(400)
-    }
+        res.sendStatus(400)    }
 }
 
 export const createShoppingListController = async (req: Request, res: Response) => {
@@ -31,7 +30,7 @@ export const createShoppingListController = async (req: Request, res: Response) 
 
         res.send( { data: result, message: 'Lista cadastrada.' }).status(201)
     } catch (error) {
-        res.send({ error: error }).status(400)
+        res.sendStatus(400)
     }
 }
 
@@ -46,7 +45,7 @@ export const deleteShoppingListController = async (req: Request, res: Response) 
         const result = await deleteShoppingListService(parseInt(id_list))
         res.send( { data: result, message: 'Lista removida.' }).status(200)
     } catch (error) {
-        res.send({ error: error }).status(400)
+        res.sendStatus(400)
     }
 }
 
@@ -61,6 +60,6 @@ export const getShoppingListDetailController = async (req: Request, res: Respons
         const result = await getShoppingListDetailService(parseInt(id_list), tenantId)
         res.send( { data: result, message: 'Informação da lista.' }).status(200)
     } catch (error) {
-        res.send({ error: error }).status(400)
+        res.sendStatus(400)
     }
 }

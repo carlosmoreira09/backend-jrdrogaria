@@ -4,7 +4,6 @@ import {usersRepository} from "../repository/usersRepository";
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
-
     if (!authHeader) {
          res.sendStatus(401);
     } else {

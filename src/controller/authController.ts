@@ -18,9 +18,9 @@ export const registerAdminController = async (req: Request, res: Response) => {
             parseInt(tenantId)
         );
 
-        res.send( { data: result, message: 'Usuário registrado com sucesso.' }).status(201)
+        res.send( { message: 'Usuário registrado com sucesso.' }).status(201)
     } catch (error) {
-        res.send({ error: error }).status(400)
+        res.sendStatus(400)
     }
 };
 
