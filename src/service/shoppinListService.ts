@@ -1,16 +1,32 @@
 import {shoppingListRepository} from "../repository/shoppingListRepository";
 import {ProductData, ShoppingList} from "../entity/ShoppingList";
-import {tenantRepository} from "../repository/tenantRepository";
+import {Products} from "../entity/Products";
+import {productsRepository} from "../repository/productsRepository";
+import {te} from "date-fns/locale/te";
 
 export const listShoppingListService = async (id_store: number) => {
-    return await shoppingListRepository.find({
-        where: {
-            tenants: {
-                id: id_store
-            }
-        },
-        relations: ['tenants', 'products']
-    })
+
+    try {
+      return await shoppingListRepository.find({
+            where: {
+                tenants: {
+                    id: id_store
+                }
+            },
+        })
+    }  catch (error) {
+        throw new Error('Erro ao listar listas de comprar')
+    }
+}
+export const updateShoopingListService = async (list: { id: number, list_name: string, products: ProductData[] }, tenantID: number) => {
+    const findList = await getShoppingListDetailService(list?.id, tenantID)
+        if(findList) {
+            delete findList.products
+            findList.products = list.products
+            return await shoppingListRepository.save(findList)
+        } else {
+            throw new Error('Erro ao atualizar lista')
+        }
 }
 
 export const createShoppingListService = async (newList: { list_name: string, products: ProductData[] } , id_store: number) => {
@@ -20,7 +36,7 @@ export const createShoppingListService = async (newList: { list_name: string, pr
            const listShopping = shoppingListRepository.create({...newList, tenants: {
                id: id_store
                }})
-       console.log(listShopping)
+
           const result =  await shoppingListRepository.save(listShopping)
 
            return { data: result, message: 'Lista criada' }

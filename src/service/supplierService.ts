@@ -33,12 +33,6 @@ export const deleteSupplierService = async (id_supplier: number) => {
     return await supplierRepository.delete({id: id_supplier})
 }
 
-export const supplierLoginService = async (cnpj: string, email: string)=> {
-    return await supplierRepository.findOne({ where: {
-            cnpj: cnpj,
-            email: email
-        }})
-}
 export const findSupplierById = async (id: number) => {
     return await supplierRepository.findOne({ where: {
             id: id

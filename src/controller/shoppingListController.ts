@@ -2,7 +2,7 @@ import {Request, Response} from "express";
 import {
     createShoppingListService,
     deleteShoppingListService, getShoppingListDetailService,
-    listShoppingListService
+    listShoppingListService, updateShoopingListService
 } from "../service/shoppinListService";
 import {ProductData, ShoppingList} from "../entity/ShoppingList";
 
@@ -26,10 +26,25 @@ export const createShoppingListController = async (req: Request, res: Response) 
     try {
         const shoppingListData: { list_name: string, products: ProductData[] } = req.body;
 
-            console.log(shoppingListData)
         const result = await createShoppingListService(shoppingListData,tenantId)
 
         res.send( { data: result, message: 'Lista cadastrada.' }).status(201)
+    } catch (error) {
+        res.sendStatus(400)
+    }
+}
+export const updateShoppingListController = async (req: Request, res: Response) => {
+    const tenantId = req.tenantId as number
+    if(!tenantId) {
+        throw new Error('Tenant não encontrado')
+    }
+    try {
+        const shoppingListData: { list_name: string, products: ProductData[] } = req.body;
+        const id = req.params.id;
+        console.log(id)
+        const result = await updateShoopingListService({...shoppingListData, id: Number(id)},tenantId)
+
+        res.send( { data: result, message: 'Lista atualizada.' }).status(200)
     } catch (error) {
         res.sendStatus(400)
     }
