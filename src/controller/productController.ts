@@ -49,6 +49,22 @@ export const createProductController = async (req: Request, res: Response) => {
         res.sendStatus(400)
     }
 }
+export const createMultipleProductController = async (req: Request, res: Response) => {
+    const tenantId = req.tenantId as number
+    if(!tenantId) {
+        throw new Error('Tenant não encontrado')
+    }
+    try {
+        const productData: Products[] = req.body;
+        productData.map( async (product) => {
+            await createProductService(product, tenantId)
+        } )
+
+        res.send( { message: 'Produtos cadastrados.' }).status(201)
+    } catch (error) {
+        res.sendStatus(400)
+    }
+}
 
 
 export const updateProductController = async (req: Request, res: Response) => {
