@@ -7,13 +7,14 @@ import {
     listSupplierController,
     updateSupplierController
 } from "../controller/supplierController";
+import {authMiddleware} from "../middlewares/authMiddleware";
 
 
 
 const router = Router();
-router.post('/', createSupplierController)
-router.get('/', listSupplierController)
-router.put('/', updateSupplierController )
-router.delete('/:id', deleteSupplierController)
-router.get('/:id', getSupplierDetailsController)
+router.post('/',authMiddleware,tenantMiddleware, createSupplierController)
+router.get('/',authMiddleware,tenantMiddleware, listSupplierController)
+router.put('/', authMiddleware,tenantMiddleware,updateSupplierController )
+router.delete('/:id', authMiddleware,tenantMiddleware,deleteSupplierController)
+router.get('/:id', authMiddleware,tenantMiddleware, getSupplierDetailsController)
 export default router

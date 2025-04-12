@@ -6,27 +6,30 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-        return res.sendStatus(401);
-    }
+         res.sendStatus(401);
+    } else {
 
-    const [, token] = authHeader.split(' ');
+        const [, token] = authHeader.split(' ');
 
-    try {
-        const decoded = verifyToken(token);
-        req.user = decoded;
+        try {
+            const decoded = verifyToken(token);
+            req.user = decoded;
 
-        const { userId, role } = decoded;
+            const {userId, role} = decoded;
 
-        let validSession = false;
-        const patient = await usersRepository.findOne({ where: { id: userId } });
-        if (patient && patient.sessionToken === token) {
-            validSession = true;
+            let validSession = false;
+            const patient = await usersRepository.findOne({where: {id: userId}});
+            if (patient && patient.sessionToken === token) {
+                validSession = true;
+            }
+
+            if (!validSession) {
+                res.sendStatus(401);
+            }
+
+            next();
+        } catch (error) {
+            res.sendStatus(401);
         }
-
-        if (!validSession) {
-            return res.sendStatus(401);        }
-
-        next();
-    } catch (error) {
-        return res.sendStatus(401);    }
+    }
 };

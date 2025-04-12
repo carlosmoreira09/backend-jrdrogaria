@@ -7,6 +7,8 @@ import supplierRoutes from "./routes/supplierRoutes";
 import productRoutes from "./routes/productRoutes";
 import authRoutes from "./routes/authRoutes";
 import generalRoutes from "./routes/generalRoutes";
+import {tenantMiddleware} from "./middlewares/tenantMiddleware";
+import {authMiddleware} from "./middlewares/authMiddleware";
 
 dotenv.config();
 
@@ -14,7 +16,6 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-
 
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/products', productRoutes);
