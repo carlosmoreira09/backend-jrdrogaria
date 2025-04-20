@@ -11,11 +11,11 @@ import {authMiddleware} from "../middlewares/authMiddleware";
 
 const router = Router();
 
-router.post('/', authMiddleware, tenantMiddleware, createProductController)
-router.post('/multiple', authMiddleware, tenantMiddleware, createMultipleProductController)
-router.get('/', authMiddleware,tenantMiddleware, listProductsController)
-router.put('/', authMiddleware,tenantMiddleware, updateProductController)
-router.delete('/:id', authMiddleware,tenantMiddleware, deleteProductController)
-router.get('/:id', authMiddleware,tenantMiddleware, getProductDetailsController)
+router.post('/', authMiddleware, createProductController)
+router.post('/multiple', authMiddleware, createMultipleProductController)
+router.get('/', authMiddleware, listProductsController)
+router.put('/', authMiddleware, updateProductController)
+router.delete('/:id', authMiddleware, deleteProductController)
+router.get('/:id', authMiddleware, getProductDetailsController)
 
 export default router;
