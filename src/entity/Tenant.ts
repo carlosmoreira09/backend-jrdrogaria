@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, CreateDateColumn, ManyToMany, JoinTable, Index } from 'typeorm';
 import {Users} from "./Users";
 import {Products} from "./Products";
+import {ShoppingList} from "./ShoppingList";
 
 @Entity()
 @Index(['id'])
@@ -17,11 +18,11 @@ export class Tenant {
     @Column()
     whatsAppNumber!: string;
 
+    @OneToMany(() => ShoppingList, tenant => tenant.tenants, { nullable: true })
+    shoppingList?: ShoppingList[];
+
     @OneToMany(() => Users, user => user.tenants, { nullable: true })
     admins!: Users[];
-
-    @OneToMany(() => Products, product => product.tenants, { nullable: true })
-    products!: Products[];
 
     @CreateDateColumn()
     created_at!: Date;

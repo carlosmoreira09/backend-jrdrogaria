@@ -28,7 +28,7 @@ export class ShoppingList {
     @Column({ type: 'json', nullable: true })
     products?: ProductData[]
 
-    @ManyToOne(() => Tenant, tenant => tenant.products, { nullable: true })
+    @ManyToOne(() => Tenant, tenant => tenant.shoppingList, { nullable: true })
     tenants?: Tenant;
 
     @CreateDateColumn()
