@@ -9,40 +9,29 @@ import {Products} from "../entity/Products";
 import {getTotalAmount} from "../service/generalService";
 
 export const listProductsController = async (req: Request, res: Response) => {
-    const tenantId = req.tenantId as number
-    if(!tenantId) {
-        throw new Error('Tenant não encontrado')
-    }
 
     try {
-        const result = await listProductsService(tenantId)
+        const result = await listProductsService()
         res.send( { data: result, message: 'Lista de Produtos.' }).status(200)
     } catch (error) {
         res.sendStatus(400)
     }
 }
 export const getProductDetailsController = async (req: Request, res: Response) => {
-    const tenantId = req.tenantId as number
-    if(!tenantId) {
-        throw new Error('Tenant não encontrado')
-    }
+
     try {
         const id_product = req.params.id as string
-        const result = await findProductById(parseInt(id_product), tenantId);
+        const result = await findProductById(parseInt(id_product));
         res.send( { data: result, message: 'Detalhe do Produto.' }).status(200)
     } catch (error) {
         res.sendStatus(400)
     }
 }
 export const createProductController = async (req: Request, res: Response) => {
-    const tenantId = req.tenantId as number
-    if(!tenantId) {
-        throw new Error('Tenant não encontrado')
-    }
     try {
         const productData: Products = req.body;
 
-        const result = await createProductService(productData, tenantId)
+        const result = await createProductService(productData)
 
         res.send( { data: result, message: 'Produto cadastrado.' }).status(201)
     } catch (error) {
@@ -50,14 +39,10 @@ export const createProductController = async (req: Request, res: Response) => {
     }
 }
 export const createMultipleProductController = async (req: Request, res: Response) => {
-    const tenantId = req.tenantId as number
-    if(!tenantId) {
-        throw new Error('Tenant não encontrado')
-    }
     try {
         const productData: Products[] = req.body;
         productData.map( async (product) => {
-            await createProductService(product, tenantId)
+            await createProductService(product)
         } )
 
         res.send( { message: 'Produtos cadastrados.' }).status(201)
@@ -68,14 +53,10 @@ export const createMultipleProductController = async (req: Request, res: Respons
 
 
 export const updateProductController = async (req: Request, res: Response) => {
-    const tenantId = req.tenantId as number
-    if(!tenantId) {
-        throw new Error('Tenant não encontrado')
-    }
     try {
         const productData: Products = req.body;
 
-        const result = await updateProductService(productData, tenantId)
+        const result = await updateProductService(productData)
 
         res.send( { data: result, message: 'Produto atualizado.' }).status(200)
     } catch (error) {
@@ -83,10 +64,6 @@ export const updateProductController = async (req: Request, res: Response) => {
     }
 }
 export const deleteProductController = async (req: Request, res: Response) => {
-    const tenantId = req.tenantId as number
-    if(!tenantId) {
-        throw new Error('Tenant não encontrado')
-    }
 
     try {
         const id_product = req.params.id

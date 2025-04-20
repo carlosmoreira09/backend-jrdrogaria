@@ -37,11 +37,10 @@ export const findSupplierById = async (id: number) => {
     return await supplierRepository.findOne({ where: {
             id: id
         },
-        relations: ['tenants']
     })
 }
 
-export const countSupplier = async (id_store: number) => {
+export const countSupplier = async () => {
     return await supplierRepository.count({ withDeleted: false })
 
 }

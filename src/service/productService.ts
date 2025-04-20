@@ -1,47 +1,34 @@
 import {productsRepository} from "../repository/productsRepository";
 import {Products} from "../entity/Products";
-import {tenantRepository} from "../repository/tenantRepository";
-import {shoppingListRepository} from "../repository/shoppingListRepository";
 
 
-export const findProductById = async (id: number, tenantId: number) => {
+export const findProductById = async (id: number) => {
     return await productsRepository.findOne({ where: {
-        id: id,
-            tenants: {
-            id: tenantId
-            }
+            id: id
         },
-        relations: ['tenants']
     })
 }
 
-export const listProductsService = async (id_store: number) => {
-    return await productsRepository.find({
-    where: {
-        tenants: {
-            id: id_store
-        }
-    },
-        relations: ['tenants']
-    })
+export const listProductsService = async () => {
+    return await productsRepository.find()
 }
 
-export const createProductService = async(product: Products, tenantID: number) => {
-    const tenant = await tenantRepository.findOne({ where: {
-        id: tenantID
-    }});
-    if(!tenant) {
-         throw new Error('Tenant não encontrado')
+export const createProductService = async(product: Products) => {
+
+    const checkProduct = await productsRepository.findOne( {
+        where: {
+            product_name: product.product_name
+        },
+        })
+    if(checkProduct) {
+        return { message:  'Produto já adicionado '}
     }
-    const newProduct = productsRepository.create({
-        ...product,
-        tenants: tenant
-    })
+    const newProduct = productsRepository.create(product)
     await productsRepository.save(newProduct)
     return { message: 'Produto adicionado'}
 }
 
-export const updateProductService = async (product: Products, tenantID: number) => {
+export const updateProductService = async (product: Products) => {
     const updateProduct = await productsRepository.update({id: product.id}, product)
     if(updateProduct.affected == 0) {
         throw new Error('Erro ao atualizar produto')
@@ -52,7 +39,7 @@ export const updateProductService = async (product: Products, tenantID: number) 
 export const deleteProdutoService = async (id_product: number) => {
     return await productsRepository.delete({id: id_product})
 }
-export const countProductService = async (id_store: number) => {
-    return await productsRepository.count({ where: { tenants: { id: id_store}}, relations: ['tenants']})
+export const countProductService = async () => {
+    return await productsRepository.count()
 
 }

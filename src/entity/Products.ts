@@ -2,10 +2,8 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
-    Index, ManyToMany, JoinTable, ManyToOne, OneToMany, OneToOne, JoinColumn,
+    Index
 } from 'typeorm';
-import {Tenant} from "./Tenant";
-import {ShoppingList} from "./ShoppingList";
 
 
 @Entity()
@@ -18,15 +16,4 @@ export class Products {
     @Column()
     product_name!: string
 
-    @ManyToOne(() => ShoppingList, list => list.products,
-        {
-            nullable: true
-        })
-    @JoinColumn({
-        name:"shoppinglistID"
-    })
-    list?: ShoppingList;
-
-    @ManyToOne(() => Tenant, tenant => tenant.products, { nullable: true })
-    tenants?: Tenant;
 }
