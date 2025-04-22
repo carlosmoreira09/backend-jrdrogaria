@@ -4,7 +4,7 @@ import {
     deleteShoppingListService, getShoppingListDetailService,
     listShoppingListService, updateShoopingListService
 } from "../service/shoppinListService";
-import {ProductData, ShoppingList} from "../entity/ShoppingList";
+import {ProductData} from "../entity/ShoppingList";
 
 export const listShoppingListController = async (req: Request, res: Response) => {
     const tenantId = req.tenantId as number

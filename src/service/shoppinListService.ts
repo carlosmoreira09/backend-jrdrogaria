@@ -1,8 +1,6 @@
 import {shoppingListRepository} from "../repository/shoppingListRepository";
-import {ProductData, ShoppingList} from "../entity/ShoppingList";
-import {Products} from "../entity/Products";
-import {productsRepository} from "../repository/productsRepository";
-import {te} from "date-fns/locale/te";
+import {ProductData} from "../entity/ShoppingList";
+
 
 export const listShoppingListService = async (id_store: number) => {
 

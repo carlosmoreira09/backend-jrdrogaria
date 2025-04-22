@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import {tenantMiddleware} from "../middlewares/tenantMiddleware";
 import {
     createMultipleProductController,
     createProductController, deleteProductController, getProductDetailsController,
