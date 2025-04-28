@@ -7,6 +7,7 @@ import supplierRoutes from "./routes/supplierRoutes";
 import productRoutes from "./routes/productRoutes";
 import authRoutes from "./routes/authRoutes";
 import generalRoutes from "./routes/generalRoutes";
+import {loggingMiddleware} from "./middlewares/loggingMiddleware";
 
 
 dotenv.config();
@@ -15,6 +16,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(loggingMiddleware); // Apply logging middleware to all routes
 
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/products', productRoutes);

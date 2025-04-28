@@ -9,8 +9,11 @@ export const listShoppingListService = async (id_store: number) => {
             where: {
                 tenants: {
                     id: id_store
-                }
+                },
             },
+          order: {
+                created_at: 'DESC'
+          }
         })
     }  catch (error) {
         throw new Error('Erro ao listar listas de comprar')
