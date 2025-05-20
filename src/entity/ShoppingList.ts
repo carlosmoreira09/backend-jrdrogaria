@@ -13,7 +13,10 @@ import {
 import {Tenant} from "./Tenant";
 export interface ProductData {
     product: string;
-    stock: number;
+    stockJR: number;
+    stockGS: number;
+    stockBARAO: number;
+    stockLB: number;
 }
 @Entity()
 @Index(['id'])
