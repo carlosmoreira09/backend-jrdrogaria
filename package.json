@@ -8,7 +8,9 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "start:prod": "NODE_ENV=production node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "audit-fix": "npm audit fix --force",
+    "health-check": "node scripts/health-check.js"
   },
   "keywords": [],
   "author": "Carlos Moreira",
@@ -16,7 +18,7 @@
   "description": "Web Application to Handle with Suppliers and Products",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "5.0.1",
+    "express": "^5.0.1",
     "mysql2": "^3.12.0",
     "ts-node": "^10.9.2",
     "typeorm": "^0.3.20",
@@ -32,7 +34,7 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
-    "@types/express": "5.0.0",
+    "@types/express": "^5.0.0",
     "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^22.4.1"

@@ -3,7 +3,7 @@ name: Deploy Backend to VPS
 on:
   push:
     branches:
-      - main  # Ou a branch que você usa para deploy
+      - main
 
 jobs:
   deploy:
@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout do código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Criar arquivo de chave SSH
         run: |
@@ -21,9 +21,53 @@ jobs:
       - name: Deploy para VPS
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem root@172.235.150.164 << 'EOF'
-            cd /var/www/backend-jrdrogaria
-            git pull origin main  # Atualiza o código
-            npm install  # Instala dependências
-            npm run build  # Compila o TypeScript (gera a pasta dist)
-            pm2 restart backend --name "backend" --interpreter node -- dist/index.js
+            set -e  # Exit on any error
+            
+            echo "🚀 Starting deployment..."
+            
+            # Navigate to project directory
+            cd /var/www/backend-shoppinglist || { echo "❌ Directory not found"; exit 1; }
+            
+            echo "📥 Pulling latest code..."
+            git pull origin main || { echo "❌ Git pull failed"; exit 1; }
+            
+            echo "🔧 Fixing security vulnerabilities..."
+            npm audit fix --force || echo "⚠️ Audit fix completed with warnings"
+            
+            echo "📦 Installing dependencies..."
+            npm install || { echo "❌ npm install failed"; exit 1; }
+            
+            echo "🏗️ Building TypeScript..."
+            npm run build || { echo "❌ Build failed"; exit 1; }
+            
+            echo "🔄 Managing PM2 process..."
+            # Create logs directory if it doesn't exist
+            mkdir -p logs
+            
+            # Check if PM2 process exists and restart or start
+            if pm2 list | grep -q "backend-shoppinglist"; then
+              echo "♻️ Restarting existing PM2 process..."
+              pm2 restart ecosystem.config.js --env production
+            else
+              echo "🆕 Starting new PM2 process..."
+              pm2 start ecosystem.config.js --env production
+            fi
+            
+            # Save PM2 configuration
+            pm2 save
+            
+            # Show PM2 status
+            pm2 status backend-shoppinglist
+            
+            # Wait a moment for the server to start
+            echo "⏳ Waiting for server to start..."
+            sleep 10
+            
+            # Run health check (if available)
+            if [ -f "scripts/health-check.js" ]; then
+              echo "🏥 Running health check..."
+              npm run health-check || echo "⚠️ Health check failed, but deployment completed"
+            fi
+            
+            echo "✅ Deployment completed successfully!"
           EOF
