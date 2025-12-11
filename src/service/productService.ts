@@ -10,7 +10,11 @@ export const findProductById = async (id: number) => {
 }
 
 export const listProductsService = async () => {
-    return await productsRepository.find()
+    return await productsRepository.find({
+        order: {
+            product_name: 'ASC'
+        }
+    })
 }
 
 export const createProductService = async(product: Products) => {
