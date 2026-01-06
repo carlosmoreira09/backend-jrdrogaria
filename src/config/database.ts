@@ -6,6 +6,12 @@ import {Products} from "../entity/Products";
 import {ShoppingList} from "../entity/ShoppingList";
 import {Supplier} from "../entity/Supplier";
 import {Tenant} from "../entity/Tenant";
+import {QuotationRequest} from "../entity/QuotationRequest";
+import {QuotationItem} from "../entity/QuotationItem";
+import {SupplierQuotation} from "../entity/SupplierQuotation";
+import {SupplierPrice} from "../entity/SupplierPrice";
+import {PurchaseOrder} from "../entity/PurchaseOrder";
+import {PurchaseOrderItem} from "../entity/PurchaseOrderItem";
 
 dotenv.config();
 
@@ -21,7 +27,14 @@ export const AppDataSource = new DataSource({
         Products,
         ShoppingList,
         Supplier,
-        Tenant],
+        Tenant,
+        QuotationRequest,
+        QuotationItem,
+        SupplierQuotation,
+        SupplierPrice,
+        PurchaseOrder,
+        PurchaseOrderItem
+    ],
     synchronize: true,
     logging: true,
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
