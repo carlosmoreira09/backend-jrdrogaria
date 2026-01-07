@@ -47,14 +47,13 @@ export type ComparisonSummary = {
 };
 
 export const getPriceComparisonService = async (
-  quotationId: number,
-  tenantId: number
+  quotationId: number
 ): Promise<ComparisonSummary> => {
   const quotationRepo = AppDataSource.getRepository(QuotationRequest);
   const priceRepo = AppDataSource.getRepository(SupplierPrice);
 
   const quotation = await quotationRepo.findOne({
-    where: { id: quotationId, tenant: { id: tenantId } },
+    where: { id: quotationId },
     relations: [
       'items',
       'items.product',
@@ -177,10 +176,9 @@ export const getPriceComparisonService = async (
 };
 
 export const getBestPricesService = async (
-  quotationId: number,
-  tenantId: number
+  quotationId: number
 ) => {
-  const comparison = await getPriceComparisonService(quotationId, tenantId);
+  const comparison = await getPriceComparisonService(quotationId);
 
   return comparison.comparisons
     .filter((c) => c.bestPrice !== null)

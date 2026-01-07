@@ -30,8 +30,8 @@ export class QuotationRequest {
   @Column({ type: 'datetime', nullable: true })
   deadline?: Date;
 
-  @ManyToOne(() => Tenant, { nullable: false })
-  tenant!: Tenant;
+  @ManyToOne(() => Tenant, { nullable: true })
+  tenant?: Tenant;
 
   @OneToMany(() => QuotationItem, (item) => item.quotationRequest, { cascade: true })
   items!: QuotationItem[];

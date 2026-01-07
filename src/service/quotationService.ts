@@ -1,6 +1,5 @@
 import { quotationRepository } from '../repository/quotationRepository';
 import { QuotationRequest } from '../entity/QuotationRequest';
-import { Tenant } from '../entity/Tenant';
 import { QuotationItem } from '../entity/QuotationItem';
 import { Products } from '../entity/Products';
 import { AppDataSource } from '../config/database';
@@ -11,15 +10,11 @@ export type CreateQuotationPayload = {
   items?: { productId: number; quantities: QuotationItem['quantities']; totalQuantity?: number }[];
 };
 
-export const createQuotationService = async (payload: CreateQuotationPayload, tenantId: number) => {
-  const tenant = new Tenant();
-  tenant.id = tenantId;
-
+export const createQuotationService = async (payload: CreateQuotationPayload) => {
   const quotation = new QuotationRequest();
   quotation.name = payload.name;
   quotation.deadline = payload.deadline;
   quotation.status = 'draft';
-  quotation.tenant = tenant;
 
   if (payload.items?.length) {
     quotation.items = payload.items.map((i) => {
@@ -37,17 +32,16 @@ export const createQuotationService = async (payload: CreateQuotationPayload, te
   return { data: saved, message: 'Cotação criada' };
 };
 
-export const listQuotationsService = async (tenantId: number) => {
+export const listQuotationsService = async () => {
   return quotationRepository.find({
-    where: { tenant: { id: tenantId } },
     relations: ['items', 'items.product', 'supplierQuotations'],
     order: { created_at: 'DESC' },
   });
 };
 
-export const getQuotationDetailService = async (id: number, tenantId: number) => {
+export const getQuotationDetailService = async (id: number) => {
   return quotationRepository.findOne({
-    where: { id, tenant: { id: tenantId } },
+    where: { id },
     relations: ['items', 'items.product', 'supplierQuotations', 'supplierQuotations.supplier'],
   });
 };
@@ -55,11 +49,10 @@ export const getQuotationDetailService = async (id: number, tenantId: number) =>
 export const updateQuotationService = async (
   id: number,
   payload: Partial<CreateQuotationPayload> & { status?: QuotationRequest['status'] },
-  tenantId: number,
 ) => {
   return AppDataSource.transaction(async (manager) => {
     const repo = manager.getRepository(QuotationRequest);
-    const quotation = await repo.findOne({ where: { id, tenant: { id: tenantId } }, relations: ['items'] });
+    const quotation = await repo.findOne({ where: { id }, relations: ['items'] });
     if (!quotation) throw new Error('Cotação não encontrada');
 
     if (payload.name !== undefined) quotation.name = payload.name;
@@ -83,6 +76,6 @@ export const updateQuotationService = async (
   });
 };
 
-export const deleteQuotationService = async (id: number, tenantId: number) => {
-  return quotationRepository.delete({ id, tenant: { id: tenantId } });
+export const deleteQuotationService = async (id: number) => {
+  return quotationRepository.delete({ id });
 };

@@ -165,6 +165,141 @@ export const exportComparisonToExcel = async (
   return workbook.xlsx.writeBuffer();
 };
 
+// Export best prices grouped by supplier (one sheet per supplier)
+export const exportBestPricesBySupplier = async (
+  comparison: ComparisonSummary
+): Promise<ExcelJS.Buffer> => {
+  const workbook = new ExcelJS.Workbook();
+  workbook.creator = 'Sistema de Cotação';
+  workbook.created = new Date();
+
+  // Group products by best supplier
+  const productsBySupplier: Record<number, {
+    supplierName: string;
+    products: {
+      productName: string;
+      totalQuantity: number;
+      quantities: { JR: number; GS: number; BARAO: number; LB: number };
+      unitPrice: number;
+      totalPrice: number;
+    }[];
+  }> = {};
+
+  comparison.comparisons
+    .filter((c) => c.bestPrice !== null)
+    .forEach((comp) => {
+      const supplierId = comp.bestPrice!.supplierId;
+      if (!productsBySupplier[supplierId]) {
+        productsBySupplier[supplierId] = {
+          supplierName: comp.bestPrice!.supplierName,
+          products: [],
+        };
+      }
+      productsBySupplier[supplierId].products.push({
+        productName: comp.productName,
+        totalQuantity: comp.totalQuantity,
+        quantities: comp.quantities,
+        unitPrice: comp.bestPrice!.unitPrice,
+        totalPrice: comp.bestPrice!.totalPrice,
+      });
+    });
+
+  // Create a sheet for each supplier
+  Object.entries(productsBySupplier).forEach(([_, supplierData]) => {
+    const sheetName = supplierData.supplierName.substring(0, 31); // Excel max sheet name is 31 chars
+    const sheet = workbook.addWorksheet(sheetName);
+
+    // Header info
+    sheet.addRow(['PEDIDO - ' + supplierData.supplierName]);
+    sheet.mergeCells('A1:G1');
+    sheet.getCell('A1').font = { bold: true, size: 14 };
+    sheet.getCell('A1').alignment = { horizontal: 'center' };
+    sheet.addRow(['Data:', new Date().toLocaleDateString('pt-BR')]);
+    sheet.addRow([]);
+
+    // Column headers
+    const headerRow = sheet.addRow([
+      'Produto',
+      'Qtd Total',
+      'JR',
+      'GS',
+      'BARÃO',
+      'LB',
+      'Preço Unit.',
+      'Total',
+    ]);
+    headerRow.font = { bold: true };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF10B981' },
+    };
+
+    // Data rows
+    let grandTotal = 0;
+    supplierData.products.forEach((product) => {
+      sheet.addRow([
+        product.productName,
+        product.totalQuantity,
+        product.quantities.JR,
+        product.quantities.GS,
+        product.quantities.BARAO,
+        product.quantities.LB,
+        product.unitPrice,
+        product.totalPrice,
+      ]);
+      grandTotal += product.totalPrice;
+    });
+
+    // Total row
+    sheet.addRow([]);
+    const totalRow = sheet.addRow(['', '', '', '', '', 'TOTAL:', '', grandTotal]);
+    totalRow.font = { bold: true };
+    totalRow.getCell(8).numFmt = 'R$ #,##0.00';
+
+    // Format columns
+    sheet.getColumn(7).numFmt = 'R$ #,##0.00';
+    sheet.getColumn(8).numFmt = 'R$ #,##0.00';
+    sheet.getColumn(1).width = 30;
+    for (let i = 2; i <= 8; i++) {
+      sheet.getColumn(i).width = 12;
+    }
+  });
+
+  // Add a summary sheet
+  const summarySheet = workbook.addWorksheet('Resumo');
+  summarySheet.addRow(['Fornecedor', 'Total de Produtos', 'Valor Total']);
+  const summaryHeader = summarySheet.getRow(1);
+  summaryHeader.font = { bold: true };
+  summaryHeader.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FF10B981' },
+  };
+
+  let grandTotal = 0;
+  Object.entries(productsBySupplier).forEach(([_, supplierData]) => {
+    const total = supplierData.products.reduce((sum, p) => sum + p.totalPrice, 0);
+    grandTotal += total;
+    summarySheet.addRow([
+      supplierData.supplierName,
+      supplierData.products.length,
+      total,
+    ]);
+  });
+
+  summarySheet.addRow([]);
+  const totalRow = summarySheet.addRow(['TOTAL GERAL', '', grandTotal]);
+  totalRow.font = { bold: true };
+
+  summarySheet.getColumn(3).numFmt = 'R$ #,##0.00';
+  summarySheet.columns.forEach((column) => {
+    column.width = 20;
+  });
+
+  return workbook.xlsx.writeBuffer();
+};
+
 export const exportOrderToExcel = async (
   order: {
     orderNumber: string;

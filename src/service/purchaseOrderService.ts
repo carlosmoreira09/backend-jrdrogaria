@@ -91,7 +91,7 @@ export const generateOrdersFromBestPricesService = async (
   quotationId: number,
   tenantId: number
 ) => {
-  const bestPrices = await getBestPricesService(quotationId, tenantId);
+  const bestPrices = await getBestPricesService(quotationId);
 
   const ordersBySupplier = new Map<
     number,

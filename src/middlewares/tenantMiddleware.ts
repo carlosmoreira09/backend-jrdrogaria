@@ -2,10 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 
 export const tenantMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const tenantId = req.headers['x-tenant-id'];
+    console.log('x-tenant-id:', tenantId);
     if (!tenantId) {
-        res.sendStatus(400)
-    } else {
-        req.tenantId = parseInt(tenantId as string);
-        next();
+        res.status(400).send({ message: 'Header x-tenant-id é obrigatório' });
+        return;
     }
+    req.tenantId = parseInt(tenantId as string);
+    next();
 }

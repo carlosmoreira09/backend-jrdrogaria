@@ -9,9 +9,9 @@ import {
   getPriceComparisonController,
   getBestPricesController,
   exportComparisonController,
+  exportBestPricesController,
 } from '../controller/quotationController';
 import { authMiddleware } from '../middlewares/authMiddleware';
-import { tenantMiddleware } from '../middlewares/tenantMiddleware';
 import {
   validateQuotationCreate,
   validateQuotationUpdate,
@@ -21,14 +21,15 @@ import {
 
 const router = Router();
 
-router.post('/', authMiddleware, tenantMiddleware, validateQuotationCreate, createQuotationController);
-router.get('/', authMiddleware, tenantMiddleware, listQuotationsController);
-router.get('/:id', authMiddleware, tenantMiddleware, validateIdParam, getQuotationDetailController);
-router.put('/:id', authMiddleware, tenantMiddleware, validateQuotationUpdate, updateQuotationController);
-router.delete('/:id', authMiddleware, tenantMiddleware, validateIdParam, deleteQuotationController);
-router.post('/:id/generate-links', authMiddleware, tenantMiddleware, validateGenerateLinks, generateSupplierLinksController);
-router.get('/:id/comparison', authMiddleware, tenantMiddleware, validateIdParam, getPriceComparisonController);
-router.get('/:id/best-prices', authMiddleware, tenantMiddleware, validateIdParam, getBestPricesController);
-router.get('/:id/export', authMiddleware, tenantMiddleware, validateIdParam, exportComparisonController);
+router.post('/', authMiddleware, validateQuotationCreate, createQuotationController);
+router.get('/', authMiddleware, listQuotationsController);
+router.get('/:id', authMiddleware, validateIdParam, getQuotationDetailController);
+router.put('/:id', authMiddleware, validateQuotationUpdate, updateQuotationController);
+router.delete('/:id', authMiddleware, validateIdParam, deleteQuotationController);
+router.post('/:id/generate-links', authMiddleware, validateGenerateLinks, generateSupplierLinksController);
+router.get('/:id/comparison', authMiddleware, validateIdParam, getPriceComparisonController);
+router.get('/:id/best-prices', authMiddleware, validateIdParam, getBestPricesController);
+router.get('/:id/export', authMiddleware, validateIdParam, exportComparisonController);
+router.get('/:id/export-orders', authMiddleware, validateIdParam, exportBestPricesController);
 
 export default router;
