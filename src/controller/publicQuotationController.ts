@@ -4,18 +4,21 @@ import {
   saveSupplierPricesService,
 } from '../service/supplierQuotationService';
 
-export const getPublicQuotationController = async (req: Request, res: Response) => {
+export const getPublicQuotationController = async (req: Request, res: Response): Promise<void> => {
   try {
     const token = req.params.token;
     const data = await getSupplierQuotationByTokenService(token);
-    if (!data) return res.status(404).send({ message: 'Link inválido ou expirado.' });
+    if (!data) {
+      res.status(404).send({ message: 'Link inválido ou expirado.' });
+      return;
+    }
     res.status(200).send({ data, message: 'Dados da cotação.' });
   } catch (error) {
     res.sendStatus(400);
   }
 };
 
-export const savePublicPricesController = async (req: Request, res: Response) => {
+export const savePublicPricesController = async (req: Request, res: Response): Promise<void> => {
   try {
     const token = req.params.token;
     const prices = req.body?.prices ?? [];

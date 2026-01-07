@@ -1,0 +1,404 @@
+paths:
+  /quotations:
+    get:
+      tags:
+        - Quotations
+      summary: Listar cotações
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Lista de cotações
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/QuotationRequest'
+                  message:
+                    type: string
+        401:
+          description: Não autorizado
+    post:
+      tags:
+        - Quotations
+      summary: Criar cotação
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                deadline:
+                  type: string
+                  format: date-time
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/QuotationItem'
+      responses:
+        201:
+          description: Cotação criada
+        400:
+          description: Erro na requisição
+
+  /quotations/{id}:
+    get:
+      tags:
+        - Quotations
+      summary: Obter detalhes da cotação
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Detalhes da cotação
+        404:
+          description: Cotação não encontrada
+    put:
+      tags:
+        - Quotations
+      summary: Atualizar cotação
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                status:
+                  type: string
+                  enum: [draft, open, closed, completed]
+      responses:
+        200:
+          description: Cotação atualizada
+    delete:
+      tags:
+        - Quotations
+      summary: Remover cotação
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Cotação removida
+
+  /quotations/{id}/generate-links:
+    post:
+      tags:
+        - Quotations
+      summary: Gerar links para fornecedores
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - supplierIds
+              properties:
+                supplierIds:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        200:
+          description: Links gerados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SupplierQuotation'
+
+  /quotations/{id}/comparison:
+    get:
+      tags:
+        - Quotations
+      summary: Comparar preços da cotação
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Comparação de preços
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ComparisonSummary'
+
+  /quotations/{id}/export:
+    get:
+      tags:
+        - Quotations
+      summary: Exportar comparação para Excel
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Arquivo Excel
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+
+  /orders:
+    get:
+      tags:
+        - Orders
+      summary: Listar pedidos
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Lista de pedidos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PurchaseOrder'
+    post:
+      tags:
+        - Orders
+      summary: Criar pedido
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - quotationId
+                - supplierId
+                - items
+              properties:
+                quotationId:
+                  type: integer
+                supplierId:
+                  type: integer
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      productId:
+                        type: integer
+                      quantities:
+                        $ref: '#/components/schemas/PharmacyQuantities'
+                      unitPrice:
+                        type: number
+      responses:
+        201:
+          description: Pedido criado
+
+  /orders/generate/{quotationId}:
+    post:
+      tags:
+        - Orders
+      summary: Gerar pedidos automaticamente a partir dos melhores preços
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: quotationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        201:
+          description: Pedidos gerados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PurchaseOrder'
+
+  /orders/{id}:
+    get:
+      tags:
+        - Orders
+      summary: Obter detalhes do pedido
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Detalhes do pedido
+
+  /orders/{id}/status:
+    put:
+      tags:
+        - Orders
+      summary: Atualizar status do pedido
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [draft, confirmed, sent, delivered]
+      responses:
+        200:
+          description: Status atualizado
+
+  /orders/{id}/export:
+    get:
+      tags:
+        - Orders
+      summary: Exportar pedido para Excel
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Arquivo Excel
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+
+  /public/quotation/{token}:
+    get:
+      tags:
+        - Public
+      summary: Obter cotação pelo token (público)
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Dados da cotação para o fornecedor
+        404:
+          description: Link inválido ou expirado
+
+  /public/quotation/{token}/prices:
+    post:
+      tags:
+        - Public
+      summary: Enviar preços do fornecedor (público)
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prices:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      productId:
+                        type: integer
+                      unitPrice:
+                        type: number
+                      available:
+                        type: boolean
+                      observation:
+                        type: string
+                submit:
+                  type: boolean
+                  description: Se true, marca como enviado
+      responses:
+        200:
+          description: Preços salvos
+        429:
+          description: Limite de requisições excedido
