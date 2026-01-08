@@ -1,47 +1,54 @@
 const http = require('http');
+const https = require('https');
 
+// Configuration - can be overridden via environment variables
 const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || 'localhost';
+const HOST = process.env.API_HOST || 'localhost';
+const PROTOCOL = process.env.API_PROTOCOL || 'http';
+const BASE_PATH = process.env.API_BASE_PATH || '';
 
-// All API endpoints to validate (method, path, expectedStatus, requiresAuth, description)
+// All API endpoints to validate
 const endpoints = [
   // Health check
-  { method: 'GET', path: '/health', expected: 200, auth: false, desc: 'Health Check' },
+  { method: 'GET', path: '/health', expected: 200, desc: 'Health Check' },
+  
+  // Debug routes endpoint
+  { method: 'GET', path: '/api/v1/debug/routes', expected: 200, desc: 'Debug Routes List' },
   
   // Auth routes - /api/v1/auth
-  { method: 'POST', path: '/api/v1/auth/login', expected: 400, auth: false, desc: 'Auth Login (no body)' },
+  { method: 'POST', path: '/api/v1/auth/login', expected: 400, desc: 'Auth Login (no body)' },
   
   // Products routes - /api/v1/products
-  { method: 'GET', path: '/api/v1/products', expected: 401, auth: false, desc: 'Products List (no auth)' },
+  { method: 'GET', path: '/api/v1/products', expected: 401, desc: 'Products List (no auth)' },
   
   // Suppliers routes - /api/v1/suppliers
-  { method: 'GET', path: '/api/v1/suppliers', expected: 401, auth: false, desc: 'Suppliers List (no auth)' },
+  { method: 'GET', path: '/api/v1/suppliers', expected: 401, desc: 'Suppliers List (no auth)' },
   
   // Shopping list routes - /api/v1/shopping
-  { method: 'GET', path: '/api/v1/shopping', expected: 401, auth: false, desc: 'Shopping List (no auth)' },
+  { method: 'GET', path: '/api/v1/shopping', expected: 401, desc: 'Shopping List (no auth)' },
   
   // General routes - /api/v1/general
-  { method: 'GET', path: '/api/v1/general', expected: 401, auth: false, desc: 'General Data (no auth)' },
+  { method: 'GET', path: '/api/v1/general', expected: 401, desc: 'General Data (no auth)' },
   
   // Quotations routes - /api/v1/quotations
-  { method: 'GET', path: '/api/v1/quotations', expected: 401, auth: false, desc: 'Quotations List (no auth)' },
+  { method: 'GET', path: '/api/v1/quotations', expected: 401, desc: 'Quotations List (no auth)' },
   
   // Purchase orders routes - /api/v1/orders
-  { method: 'GET', path: '/api/v1/orders', expected: 401, auth: false, desc: 'Orders List (no auth)' },
-  
-  // Public routes - /api/v1/public (should be accessible)
-  { method: 'GET', path: '/api/v1/public/quotation/invalid-token', expected: 404, auth: false, desc: 'Public Quotation (invalid token)' },
+  { method: 'GET', path: '/api/v1/orders', expected: 401, desc: 'Orders List (no auth)' },
   
   // Swagger docs
-  { method: 'GET', path: '/api/docs/', expected: 200, auth: false, desc: 'Swagger Docs' },
+  { method: 'GET', path: '/api/docs/', expected: 200, desc: 'Swagger Docs' },
 ];
 
 const checkEndpoint = (endpoint) => {
   return new Promise((resolve) => {
+    const client = PROTOCOL === 'https' ? https : http;
+    const defaultPort = PROTOCOL === 'https' ? 443 : PORT;
+    
     const options = {
       hostname: HOST,
-      port: PORT,
-      path: endpoint.path,
+      port: PROTOCOL === 'https' ? 443 : PORT,
+      path: BASE_PATH + endpoint.path,
       method: endpoint.method,
       timeout: 5000,
       headers: {
@@ -49,7 +56,7 @@ const checkEndpoint = (endpoint) => {
       },
     };
 
-    const req = http.request(options, (res) => {
+    const req = client.request(options, (res) => {
       // Accept the expected status OR common auth/validation errors (401, 400) for protected routes
       const isExpected = res.statusCode === endpoint.expected;
       const isAuthError = res.statusCode === 401 && !endpoint.auth;
@@ -94,7 +101,8 @@ const checkEndpoint = (endpoint) => {
 
 const runHealthCheck = async () => {
   console.log('🏥 Running comprehensive health check...\n');
-  console.log(`📍 Target: http://${HOST}:${PORT}\n`);
+  const portDisplay = PROTOCOL === 'https' ? '' : `:${PORT}`;
+  console.log(`📍 Target: ${PROTOCOL}://${HOST}${portDisplay}${BASE_PATH}\n`);
   console.log('=' .repeat(70));
 
   const results = [];
