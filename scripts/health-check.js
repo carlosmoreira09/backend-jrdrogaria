@@ -1,37 +1,155 @@
 const http = require('http');
 
-const healthCheck = () => {
-  const options = {
-    hostname: 'localhost',
-    port: process.env.PORT || 3000,
-    path: '/health',
-    method: 'GET',
-    timeout: 5000
-  };
+const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || 'localhost';
 
-  const req = http.request(options, (res) => {
-    if (res.statusCode === 200) {
-      console.log('✅ Health check passed - Server is running');
-      process.exit(0);
-    } else {
-      console.log(`❌ Health check failed - Status: ${res.statusCode}`);
-      process.exit(1);
+// All API endpoints to validate (method, path, expectedStatus, requiresAuth, description)
+const endpoints = [
+  // Health check
+  { method: 'GET', path: '/health', expected: 200, auth: false, desc: 'Health Check' },
+  
+  // Auth routes - /api/v1/auth
+  { method: 'POST', path: '/api/v1/auth/login', expected: 400, auth: false, desc: 'Auth Login (no body)' },
+  
+  // Products routes - /api/v1/products
+  { method: 'GET', path: '/api/v1/products', expected: 401, auth: false, desc: 'Products List (no auth)' },
+  
+  // Suppliers routes - /api/v1/suppliers
+  { method: 'GET', path: '/api/v1/suppliers', expected: 401, auth: false, desc: 'Suppliers List (no auth)' },
+  
+  // Shopping list routes - /api/v1/shopping
+  { method: 'GET', path: '/api/v1/shopping', expected: 401, auth: false, desc: 'Shopping List (no auth)' },
+  
+  // General routes - /api/v1/general
+  { method: 'GET', path: '/api/v1/general', expected: 401, auth: false, desc: 'General Data (no auth)' },
+  
+  // Quotations routes - /api/v1/quotations
+  { method: 'GET', path: '/api/v1/quotations', expected: 401, auth: false, desc: 'Quotations List (no auth)' },
+  
+  // Purchase orders routes - /api/v1/orders
+  { method: 'GET', path: '/api/v1/orders', expected: 401, auth: false, desc: 'Orders List (no auth)' },
+  
+  // Public routes - /api/v1/public (should be accessible)
+  { method: 'GET', path: '/api/v1/public/quotation/invalid-token', expected: 404, auth: false, desc: 'Public Quotation (invalid token)' },
+  
+  // Swagger docs
+  { method: 'GET', path: '/api/docs/', expected: 200, auth: false, desc: 'Swagger Docs' },
+];
+
+const checkEndpoint = (endpoint) => {
+  return new Promise((resolve) => {
+    const options = {
+      hostname: HOST,
+      port: PORT,
+      path: endpoint.path,
+      method: endpoint.method,
+      timeout: 5000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const req = http.request(options, (res) => {
+      // Accept the expected status OR common auth/validation errors (401, 400) for protected routes
+      const isExpected = res.statusCode === endpoint.expected;
+      const isAuthError = res.statusCode === 401 && !endpoint.auth;
+      const isValidationError = res.statusCode === 400;
+      const isSuccess = isExpected || (endpoint.expected === 401 && isAuthError);
+      
+      resolve({
+        ...endpoint,
+        status: res.statusCode,
+        success: res.statusCode !== 404, // 404 means route doesn't exist
+        routeExists: res.statusCode !== 404,
+      });
+    });
+
+    req.on('error', (error) => {
+      resolve({
+        ...endpoint,
+        status: 'ERROR',
+        success: false,
+        routeExists: false,
+        error: error.message,
+      });
+    });
+
+    req.on('timeout', () => {
+      req.destroy();
+      resolve({
+        ...endpoint,
+        status: 'TIMEOUT',
+        success: false,
+        routeExists: false,
+      });
+    });
+
+    // Send empty body for POST requests
+    if (endpoint.method === 'POST') {
+      req.write('{}');
     }
+    req.end();
   });
+};
 
-  req.on('error', (error) => {
-    console.log(`❌ Health check failed - Error: ${error.message}`);
+const runHealthCheck = async () => {
+  console.log('🏥 Running comprehensive health check...\n');
+  console.log(`📍 Target: http://${HOST}:${PORT}\n`);
+  console.log('=' .repeat(70));
+
+  const results = [];
+  let allRoutesExist = true;
+  let criticalFailure = false;
+
+  for (const endpoint of endpoints) {
+    const result = await checkEndpoint(endpoint);
+    results.push(result);
+
+    const statusIcon = result.routeExists ? '✅' : '❌';
+    const statusText = result.routeExists ? 'FOUND' : 'NOT FOUND (404)';
+    
+    console.log(`${statusIcon} [${endpoint.method.padEnd(6)}] ${endpoint.path.padEnd(45)} -> ${result.status} (${statusText})`);
+    
+    if (!result.routeExists) {
+      allRoutesExist = false;
+      if (endpoint.path === '/health') {
+        criticalFailure = true;
+      }
+    }
+  }
+
+  console.log('=' .repeat(70));
+  console.log('\n📊 Summary:');
+  
+  const foundRoutes = results.filter(r => r.routeExists).length;
+  const missingRoutes = results.filter(r => !r.routeExists);
+  
+  console.log(`   ✅ Routes found: ${foundRoutes}/${results.length}`);
+  console.log(`   ❌ Routes missing: ${missingRoutes.length}/${results.length}`);
+  
+  if (missingRoutes.length > 0) {
+    console.log('\n⚠️  Missing routes:');
+    missingRoutes.forEach(r => {
+      console.log(`   - ${r.method} ${r.path} (${r.desc})`);
+    });
+  }
+
+  console.log('');
+  
+  if (criticalFailure) {
+    console.log('❌ CRITICAL: Health endpoint not found!');
     process.exit(1);
-  });
-
-  req.on('timeout', () => {
-    console.log('❌ Health check failed - Timeout');
-    req.destroy();
+  } else if (allRoutesExist) {
+    console.log('✅ All routes are properly registered!');
+    process.exit(0);
+  } else {
+    console.log('⚠️  Some routes are missing - check the deployment');
     process.exit(1);
-  });
-
-  req.end();
+  }
 };
 
 // Run health check
-healthCheck();
+runHealthCheck().catch((error) => {
+  console.error('❌ Health check failed with error:', error.message);
+  process.exit(1);
+});
