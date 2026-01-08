@@ -18,8 +18,8 @@ export class Supplier {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => Tenant, { nullable: true })
-    tenant?: Tenant;
+    @ManyToOne(() => Tenant, { nullable: false })
+    tenant!: Tenant;
 
     @Column()
     supplier_name!: string;

@@ -22,6 +22,9 @@ import supplierRoutesV3 from "./routes/v3/supplierRoutes.v3";
 import storeRoutesV3 from "./routes/v3/storeRoutes.v3";
 import authRoutesV3 from "./routes/v3/authRoutes.v3";
 
+// Admin Panel Routes
+import adminRoutes from "./routes/adminRoutes";
+
 import {loggingMiddleware} from "./middlewares/loggingMiddleware";
 import { swaggerSpec } from "./config/swagger";
 
@@ -60,6 +63,11 @@ app.use('/api/v3/orders', purchaseOrderRoutesV3);
 app.use('/api/v3/products', productRoutesV3);
 app.use('/api/v3/suppliers', supplierRoutesV3);
 app.use('/api/v3/stores', storeRoutesV3);
+
+// =============================================
+// Admin Panel API - Gestão do SaaS
+// =============================================
+app.use('/admin/v1', adminRoutes);
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customCss: '.swagger-ui .topbar { display: none }',

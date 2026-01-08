@@ -19,11 +19,11 @@ export class PurchaseOrderItem {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => Tenant, { nullable: true })
-  tenant?: Tenant;
+  @ManyToOne(() => Tenant, { nullable: false })
+  tenant!: Tenant;
 
-  @ManyToOne(() => Store, { nullable: true })
-  store?: Store;
+  @ManyToOne(() => Store, { nullable: false })
+  store!: Store;
 
   @ManyToOne(() => PurchaseOrder, (po) => po.items, { nullable: false, onDelete: 'CASCADE' })
   purchaseOrder!: PurchaseOrder;

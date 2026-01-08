@@ -14,6 +14,15 @@ import { SupplierQuotation } from "../entity/SupplierQuotation";
 import { SupplierPrice } from "../entity/SupplierPrice";
 import { PurchaseOrder } from "../entity/PurchaseOrder";
 import { PurchaseOrderItem } from "../entity/PurchaseOrderItem";
+import { AdminUser } from "../entity/AdminUser";
+import { AdminAuditLog } from "../entity/AdminAuditLog";
+import { PlatformMetrics } from "../entity/PlatformMetrics";
+import { ProductMapping } from "../entity/ProductMapping";
+import { Subscription } from "../entity/Subscription";
+import { SupplierInvitation } from "../entity/SupplierInvitation";
+import { SupplierProduct } from "../entity/SupplierProduct";
+import { SupplierResponse } from "../entity/SupplierResponse";
+import { SupplierResponseItem } from "../entity/SupplierResponseItem";
 
 dotenv.config();
 
@@ -37,7 +46,16 @@ export const AppDataSource = new DataSource({
         SupplierQuotation,
         SupplierPrice,
         PurchaseOrder,
-        PurchaseOrderItem
+        PurchaseOrderItem,
+        AdminUser,
+        AdminAuditLog,
+        PlatformMetrics,
+        ProductMapping,
+        Subscription,
+        SupplierInvitation,
+        SupplierProduct,
+        SupplierResponse,
+        SupplierResponseItem,
     ],
     synchronize: true,
     logging: true,

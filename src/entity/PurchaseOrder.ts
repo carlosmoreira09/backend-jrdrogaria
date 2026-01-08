@@ -26,11 +26,11 @@ export class PurchaseOrder {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => Tenant, { nullable: true })
-  tenant?: Tenant;
+  @ManyToOne(() => Tenant, { nullable: false })
+  tenant!: Tenant;
 
-  @ManyToOne(() => Store, { nullable: true })
-  store?: Store;
+  @ManyToOne(() => Store, { nullable: false })
+  store!: Store;
 
   @Column()
   orderNumber!: string;

@@ -14,11 +14,27 @@ import { Tenant } from '../../entity/Tenant';
 import { purchaseOrderRepository } from '../../repository/purchaseOrderRepository';
 import { getBestPricesServiceLegacy } from './priceComparisonService.legacy';
 
-const DEFAULT_TENANT_ID = 1;
+import { Store } from '../../entity/Store';
 
-async function getDefaultTenant(): Promise<Tenant | null> {
+const DEFAULT_TENANT_ID = 1;
+const DEFAULT_STORE_ID = 1;
+
+async function getDefaultTenant(): Promise<Tenant> {
   const tenantRepo = AppDataSource.getRepository(Tenant);
-  return tenantRepo.findOne({ where: { id: DEFAULT_TENANT_ID } });
+  const tenant = await tenantRepo.findOne({ where: { id: DEFAULT_TENANT_ID } });
+  if (!tenant) {
+    throw new Error('Default tenant not found');
+  }
+  return tenant;
+}
+
+async function getDefaultStore(): Promise<Store> {
+  const storeRepo = AppDataSource.getRepository(Store);
+  const store = await storeRepo.findOne({ where: { id: DEFAULT_STORE_ID } });
+  if (!store) {
+    throw new Error('Default store not found');
+  }
+  return store;
 }
 
 export type CreateOrderPayloadLegacy = {
@@ -54,9 +70,12 @@ export const createPurchaseOrderServiceLegacy = async (
     const orderRepo = manager.getRepository(PurchaseOrder);
     const itemRepo = manager.getRepository(PurchaseOrderItem);
 
+    const store = await getDefaultStore();
+    
     const order = new PurchaseOrder();
-    order.orderNumber = generateOrderNumber(tenant?.id || 1);
-    order.tenant = tenant || undefined;
+    order.orderNumber = generateOrderNumber(tenant.id);
+    order.tenant = tenant;
+    order.store = store;
 
     const supplier = new Supplier();
     supplier.id = payload.supplierId;
@@ -76,7 +95,8 @@ export const createPurchaseOrderServiceLegacy = async (
       orderItem.quantity = item.quantity;
       orderItem.unitPrice = item.unitPrice;
       orderItem.subtotal = item.quantity * item.unitPrice;
-      orderItem.tenant = tenant || undefined;
+      orderItem.tenant = tenant;
+      orderItem.store = store;
       totalValue += orderItem.subtotal;
 
       return orderItem;

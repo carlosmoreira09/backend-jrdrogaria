@@ -17,8 +17,8 @@ export class Products {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @ManyToOne(() => Tenant, { nullable: true })
-    tenant?: Tenant;
+    @ManyToOne(() => Tenant, { nullable: false })
+    tenant!: Tenant;
 
     @Column()
     product_name!: string;

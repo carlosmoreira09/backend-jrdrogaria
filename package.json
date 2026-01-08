@@ -16,7 +16,8 @@
     "migrate-data": "ts-node -r dotenv/config src/scripts/full-migration.ts",
     "migrate-schema": "ts-node -r dotenv/config src/scripts/run-migration.ts",
     "drop-tables": "ts-node -r dotenv/config src/scripts/drop-tables.ts",
-    "seed": "ts-node -r dotenv/config src/scripts/seed-data.ts"
+    "seed": "ts-node -r dotenv/config src/scripts/seed-data.ts",
+    "seed-admin": "ts-node -r dotenv/config src/scripts/seed-admin.ts"
   },
   "keywords": [],
   "author": "Carlos Moreira",
