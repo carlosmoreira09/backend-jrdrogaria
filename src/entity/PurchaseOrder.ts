@@ -11,34 +11,44 @@ import {
 import { QuotationRequest } from './QuotationRequest';
 import { Supplier } from './Supplier';
 import { Tenant } from './Tenant';
+import { Store } from './Store';
+import { Users } from './Users';
 import { PurchaseOrderItem } from './PurchaseOrderItem';
 
 export type PurchaseOrderStatus = 'draft' | 'confirmed' | 'sent' | 'delivered';
 
 @Entity()
-@Index(['orderNumber'], { unique: true })
-@Index(['status'])
+@Index(['tenant', 'orderNumber'], { unique: true })
+@Index(['tenant', 'store', 'created_at'])
+@Index(['tenant', 'store', 'status'])
+@Index(['tenant', 'store', 'supplier'])
 export class PurchaseOrder {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @ManyToOne(() => Tenant, { nullable: true })
+  tenant?: Tenant;
+
+  @ManyToOne(() => Store, { nullable: true })
+  store?: Store;
+
   @Column()
   orderNumber!: string;
 
-  @ManyToOne(() => QuotationRequest, { nullable: false })
-  quotationRequest!: QuotationRequest;
+  @ManyToOne(() => QuotationRequest, { nullable: true })
+  quotationRequest?: QuotationRequest;
 
   @ManyToOne(() => Supplier, { nullable: false })
   supplier!: Supplier;
 
-  @ManyToOne(() => Tenant, { nullable: false })
-  tenant!: Tenant;
-
   @Column({ type: 'enum', enum: ['draft', 'confirmed', 'sent', 'delivered'], default: 'draft' })
   status!: PurchaseOrderStatus;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   totalValue!: number;
+
+  @ManyToOne(() => Users, { nullable: true })
+  created_by_user?: Users;
 
   @OneToMany(() => PurchaseOrderItem, (poi) => poi.purchaseOrder, { cascade: true })
   items!: PurchaseOrderItem[];
@@ -48,10 +58,4 @@ export class PurchaseOrder {
 
   @UpdateDateColumn()
   updated_at!: Date;
-
-  @Column({ nullable: true })
-  created_by?: string;
-
-  @Column({ nullable: true })
-  updated_by?: string;
 }

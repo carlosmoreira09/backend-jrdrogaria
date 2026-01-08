@@ -2,29 +2,52 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
-    Index, CreateDateColumn, DeleteDateColumn,
+    Index,
+    CreateDateColumn,
+    DeleteDateColumn,
+    ManyToOne
 } from 'typeorm';
+import { Tenant } from './Tenant';
 
+export type SupplierStatus = 'active' | 'inactive';
 
 @Entity()
-@Index(['id', 'supplier_name'])
+@Index(['tenant', 'supplier_name'])
+@Index(['tenant', 'status'])
 export class Supplier {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
-    supplier_name!: string
-
-    @Column({ nullable: true})
-    whatsAppNumber!: string;
+    @ManyToOne(() => Tenant, { nullable: true })
+    tenant?: Tenant;
 
     @Column()
-    payment_term!: string
+    supplier_name!: string;
+
+    @Column({ nullable: true })
+    cnpj?: string;
+
+    @Column({ nullable: true })
+    email?: string;
+
+    @Column({ nullable: true })
+    whatsAppNumber?: string;
+
+    @Column({ nullable: true })
+    phone?: string;
+
+    @Column({ nullable: true })
+    payment_term?: string;
+
+    @Column({ nullable: true })
+    contactName?: string;
+
+    @Column({ type: 'enum', enum: ['active', 'inactive'], default: 'active' })
+    status!: SupplierStatus;
 
     @CreateDateColumn()
     created_at!: Date;
 
     @DeleteDateColumn()
-    delete_at?: Date;
-
+    deleted_at?: Date;
 }

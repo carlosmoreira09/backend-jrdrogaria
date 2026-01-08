@@ -6,35 +6,35 @@ import {tenantRepository} from "../repository/tenantRepository";
 import {Users} from "../entity/Users";
 import {LoginAdminDTO} from "../schemas/auth/auth";
 
-const findAdminByEmail = async (email: string): Promise<Users | null> => {
-    return await usersRepository.findOne({where: { email: email }, relations: ['tenants']});
+const findUserByEmail = async (email: string): Promise<Users | null> => {
+    return await usersRepository.findOne({where: { email: email }, relations: ['tenant']});
 };
-export const getAdminById = async (adminID: number): Promise<Users | null> => {
-    return await usersRepository.findOne({ where: { id: adminID }, relations: ['tenants'] });
+export const getUserById = async (userId: number): Promise<Users | null> => {
+    return await usersRepository.findOne({ where: { id: userId }, relations: ['tenant'] });
 };
 
-export const registerAdmin = async (adminData: Users, tenantId: number): Promise<{ data: Users; message: string; }> => {
-    const hashedPassword = await bcrypt.hash(adminData.password!, 10);
+export const registerUser = async (userData: Partial<Users>, tenantId: number): Promise<{ data: Users; message: string; }> => {
+    const hashedPassword = await bcrypt.hash(userData.password!, 10);
     const tenant = await tenantRepository.findOne({where: {id: tenantId}});
     if (!tenant) {
         throw new Error('Tenant não encontrado.');
     }
 
-    const newAdmin = usersRepository.create({
-        ...adminData,
+    const newUser = usersRepository.create({
+        ...userData,
         password: hashedPassword,
-        tenants: tenant
+        tenant: tenant
     });
     try {
-        const result = await usersRepository.save(newAdmin);
-        return {data: result, message: 'Admin registrado com sucesso'};
+        const result = await usersRepository.save(newUser);
+        return {data: result, message: 'Usuário registrado com sucesso'};
     } catch (error) {
-        throw new Error("Erro ao registrar admin: Verifique se o email ou CPF já existe.");
+        throw new Error("Erro ao registrar usuário: Verifique se o email já existe.");
     }
 };
 
-export const loginAdmin = async (loginData: LoginAdminDTO): Promise<any>  => {
-    let user: Users | null = await findAdminByEmail(loginData.user)
+export const loginUser = async (loginData: LoginAdminDTO): Promise<any>  => {
+    let user: Users | null = await findUserByEmail(loginData.user)
     if (!user) {
         throw new Error('Usuário não encontrado')
     }
@@ -42,16 +42,16 @@ export const loginAdmin = async (loginData: LoginAdminDTO): Promise<any>  => {
     if (!isPasswordValid) {
         throw new Error('Senha inválida')
     }
-    const tenants = user.tenants;
-    const token = generateToken(user.id, user.role, tenants.id, tenants.name);
+    const tenant = user.tenant;
+    const token = generateToken(user.id, user.role, tenant.id, tenant.slug, tenant.name);
     return { token };
 };
 
 
-export const getAdmins = async (tenantId: number) => {
+export const getUsers = async (tenantId: number) => {
     return await usersRepository.find({
-        where: { tenants: { id: tenantId } },
-        relations: ['tenants'],
+        where: { tenant: { id: tenantId } },
+        relations: ['tenant'],
     });
 };
 

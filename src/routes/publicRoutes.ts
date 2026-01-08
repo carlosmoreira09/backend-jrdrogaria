@@ -1,21 +1,24 @@
+/**
+ * Public Routes v1 - Legacy (retrocompatível)
+ * Para links públicos de fornecedores
+ */
+
 import { Router } from 'express';
 import { 
-  getPublicQuotationController, 
-  savePublicPricesController,
-  getQuotationForAnonymousController,
-  saveAnonymousSupplierPricesController,
-} from '../controller/publicQuotationController';
+  getQuotationByTokenControllerLegacy, 
+  savePricesControllerLegacy,
+  submitPublicQuotationControllerLegacy,
+} from '../controller/legacy/publicController.legacy';
 import { publicRateLimiter, submitRateLimiter } from '../middlewares/rateLimitMiddleware';
 import { validatePublicPrices } from '../middlewares/validators';
 
 const router = Router();
 
-// Existing routes for registered suppliers
-router.get('/quotation/:token', publicRateLimiter, getPublicQuotationController);
-router.post('/quotation/:token/prices', submitRateLimiter, validatePublicPrices, savePublicPricesController);
+// v1 Legacy Routes - para fornecedores
+router.get('/quotation/:token', publicRateLimiter, getQuotationByTokenControllerLegacy);
+router.post('/quotation/:token/prices', submitRateLimiter, validatePublicPrices, savePricesControllerLegacy);
 
 // Routes for anonymous suppliers
-router.get('/quotation-open/:id', publicRateLimiter, getQuotationForAnonymousController);
-router.post('/quotation-open/:id/submit', submitRateLimiter, saveAnonymousSupplierPricesController);
+router.post('/quotation/:token/submit', submitRateLimiter, submitPublicQuotationControllerLegacy);
 
 export default router;

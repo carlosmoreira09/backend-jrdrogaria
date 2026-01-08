@@ -5,17 +5,27 @@ import {
     CreateDateColumn,
     Index,
     DeleteDateColumn,
-    JoinTable, ManyToOne
+    ManyToOne,
+    OneToMany,
+    UpdateDateColumn
 } from 'typeorm';
 import { Tenant } from './Tenant';
+import { UserStore } from './UserStore';
+
+export type UserRole = 'tenant_owner' | 'admin' | 'buyer' | 'finance' | 'viewer';
+export type UserStatus = 'active' | 'inactive';
 
 @Entity()
-@Index(['id', 'fullName'])
+@Index(['tenant', 'email'], { unique: true })
+@Index(['tenant', 'status'])
 export class Users {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({ unique: true })
+    @ManyToOne(() => Tenant, tenant => tenant.users, { nullable: false })
+    tenant!: Tenant;
+
+    @Column()
     email!: string;
 
     @Column()
@@ -24,16 +34,24 @@ export class Users {
     @Column()
     password!: string;
 
-    @Column({ nullable: false })
-    role!: string;
-    
+    @Column({ type: 'enum', enum: ['tenant_owner', 'admin', 'buyer', 'finance', 'viewer'], default: 'viewer' })
+    role!: UserRole;
+
+    @Column({ type: 'enum', enum: ['active', 'inactive'], default: 'active' })
+    status!: UserStatus;
+
+    @OneToMany(() => UserStore, userStore => userStore.user)
+    userStores!: UserStore[];
+
+    @Column({ type: 'datetime', nullable: true })
+    last_login_at?: Date;
+
     @CreateDateColumn()
     created_at!: Date;
 
-    @ManyToOne(() => Tenant, tenant => tenant.admins, { nullable: true })
-    @JoinTable()
-    tenants!: Tenant;
+    @UpdateDateColumn()
+    updated_at!: Date;
 
     @DeleteDateColumn()
-    delete_at?: Date;
+    deleted_at?: Date;
 }

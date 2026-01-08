@@ -7,22 +7,25 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Tenant } from './Tenant';
+import { Store } from './Store';
 import { QuotationRequest } from './QuotationRequest';
 import { Products } from './Products';
 
-export type PharmacyQuantities = {
-  JR: number;
-  GS: number;
-  BARAO: number;
-  LB: number;
-};
+export type StoreQuantities = Record<string, number>;
 
 @Entity()
-@Index(['id'])
-@Index(['product'])
+@Index(['tenant', 'store', 'quotationRequest'])
+@Index(['tenant', 'store', 'product'])
 export class QuotationItem {
   @PrimaryGeneratedColumn()
   id!: number;
+
+  @ManyToOne(() => Tenant, { nullable: true })
+  tenant?: Tenant;
+
+  @ManyToOne(() => Store, { nullable: true })
+  store?: Store;
 
   @ManyToOne(() => QuotationRequest, (qr) => qr.items, { nullable: false, onDelete: 'CASCADE' })
   quotationRequest!: QuotationRequest;
@@ -30,21 +33,15 @@ export class QuotationItem {
   @ManyToOne(() => Products, { nullable: false })
   product!: Products;
 
-  @Column({ type: 'json', nullable: false })
-  quantities!: PharmacyQuantities;
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  quantity!: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
-  totalQuantity?: number;
+  @Column({ nullable: true })
+  notes?: string;
 
   @CreateDateColumn()
   created_at!: Date;
 
   @UpdateDateColumn()
   updated_at!: Date;
-
-  @Column({ nullable: true })
-  created_by?: string;
-
-  @Column({ nullable: true })
-  updated_by?: string;
 }

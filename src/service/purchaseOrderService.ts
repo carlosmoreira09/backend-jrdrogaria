@@ -13,7 +13,7 @@ export type CreateOrderPayload = {
   supplierId: number;
   items: {
     productId: number;
-    quantities: { JR: number; GS: number; BARAO: number; LB: number };
+    quantity: number;
     unitPrice: number;
   }[];
 };
@@ -21,7 +21,7 @@ export type CreateOrderPayload = {
 export type UpdateOrderItemsPayload = {
   items: {
     productId: number;
-    quantities: { JR: number; GS: number; BARAO: number; LB: number };
+    quantity: number;
   }[];
 };
 
@@ -61,15 +61,9 @@ export const createPurchaseOrderService = async (
       const product = new Products();
       product.id = item.productId;
       orderItem.product = product;
-      orderItem.quantities = item.quantities;
+      orderItem.quantity = item.quantity;
       orderItem.unitPrice = item.unitPrice;
-
-      const totalQty =
-        item.quantities.JR +
-        item.quantities.GS +
-        item.quantities.BARAO +
-        item.quantities.LB;
-      orderItem.subtotal = totalQty * item.unitPrice;
+      orderItem.subtotal = item.quantity * item.unitPrice;
       totalValue += orderItem.subtotal;
 
       return orderItem;
@@ -101,7 +95,7 @@ export const generateOrdersFromBestPricesService = async (
       items: {
         productId: number;
         productName: string;
-        quantities: { JR: number; GS: number; BARAO: number; LB: number };
+        quantity: number;
         unitPrice: number;
       }[];
     }
@@ -118,7 +112,7 @@ export const generateOrdersFromBestPricesService = async (
     ordersBySupplier.get(bp.bestSupplierId)!.items.push({
       productId: bp.productId,
       productName: bp.productName,
-      quantities: bp.quantities,
+      quantity: bp.quantity,
       unitPrice: bp.unitPrice,
     });
   }
@@ -182,13 +176,8 @@ export const updatePurchaseOrderItemsService = async (
       );
 
       if (existingItem) {
-        existingItem.quantities = updateItem.quantities;
-        const totalQty =
-          updateItem.quantities.JR +
-          updateItem.quantities.GS +
-          updateItem.quantities.BARAO +
-          updateItem.quantities.LB;
-        existingItem.subtotal = totalQty * Number(existingItem.unitPrice);
+        existingItem.quantity = updateItem.quantity;
+        existingItem.subtotal = updateItem.quantity * Number(existingItem.unitPrice);
         totalValue += existingItem.subtotal;
         await itemRepo.save(existingItem);
       }

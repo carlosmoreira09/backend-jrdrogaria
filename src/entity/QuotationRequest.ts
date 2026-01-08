@@ -9,17 +9,25 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Tenant } from './Tenant';
+import { Store } from './Store';
+import { Users } from './Users';
 import { QuotationItem } from './QuotationItem';
 import { SupplierQuotation } from './SupplierQuotation';
 
 export type QuotationStatus = 'draft' | 'open' | 'closed' | 'completed';
 
 @Entity()
-@Index(['id'])
-@Index(['status'])
+@Index(['tenant', 'store', 'created_at'])
+@Index(['tenant', 'store', 'status'])
 export class QuotationRequest {
   @PrimaryGeneratedColumn()
   id!: number;
+
+  @ManyToOne(() => Tenant, { nullable: true })
+  tenant?: Tenant;
+
+  @ManyToOne(() => Store, { nullable: true })
+  store?: Store;
 
   @Column()
   name!: string;
@@ -30,8 +38,8 @@ export class QuotationRequest {
   @Column({ type: 'datetime', nullable: true })
   deadline?: Date;
 
-  @ManyToOne(() => Tenant, { nullable: true })
-  tenant?: Tenant;
+  @ManyToOne(() => Users, { nullable: true })
+  created_by_user?: Users;
 
   @OneToMany(() => QuotationItem, (item) => item.quotationRequest, { cascade: true })
   items!: QuotationItem[];
@@ -44,10 +52,4 @@ export class QuotationRequest {
 
   @UpdateDateColumn()
   updated_at!: Date;
-
-  @Column({ nullable: true })
-  created_by?: string;
-
-  @Column({ nullable: true })
-  updated_by?: string;
 }

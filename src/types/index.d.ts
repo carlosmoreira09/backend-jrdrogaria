@@ -1,12 +1,16 @@
-import { Request } from 'express';
+import { Tenant } from '../entity/Tenant';
+import { Store } from '../entity/Store';
+import { Users } from '../entity/Users';
 
-declare module 'express' {
-    export interface Request {
-        tenantId?: number;
-        user?: {
-            userId: number;
+declare global {
+    namespace Express {
+        interface Request {
             tenantId?: number;
-            role: string;
-        };
+            tenant?: Tenant;
+            store?: Store;
+            user?: Users;
+        }
     }
 }
+
+export {};

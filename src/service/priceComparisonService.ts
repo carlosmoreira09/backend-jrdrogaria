@@ -5,13 +5,7 @@ import { SupplierPrice } from '../entity/SupplierPrice';
 export type PriceComparison = {
   productId: number;
   productName: string;
-  totalQuantity: number;
-  quantities: {
-    JR: number;
-    GS: number;
-    BARAO: number;
-    LB: number;
-  };
+  quantity: number;
   prices: {
     supplierId: number;
     supplierName: string;
@@ -88,14 +82,14 @@ export const getPriceComparisonService = async (
         (p) => p.supplierQuotation.id === sq.id
       );
       return {
-        supplierId: sq.supplier.id,
-        supplierName: sq.supplier.supplier_name,
+        supplierId: sq.supplier!.id,
+        supplierName: sq.supplier!.supplier_name,
         unitPrice: priceEntry?.unitPrice ?? null,
         available: priceEntry?.available ?? false,
         observation: priceEntry?.observation,
         totalPrice:
-          priceEntry?.unitPrice && item.totalQuantity
-            ? Number(priceEntry.unitPrice) * Number(item.totalQuantity)
+          priceEntry?.unitPrice && item.quantity
+            ? Number(priceEntry.unitPrice) * Number(item.quantity)
             : null,
       };
     });
@@ -126,8 +120,7 @@ export const getPriceComparisonService = async (
     return {
       productId: item.product.id,
       productName: item.product.product_name,
-      totalQuantity: Number(item.totalQuantity) || 0,
-      quantities: item.quantities,
+      quantity: Number(item.quantity) || 0,
       prices,
       bestPrice,
     };
@@ -139,19 +132,19 @@ export const getPriceComparisonService = async (
     let productsQuoted = 0;
 
     comparisons.forEach((comp) => {
-      const priceEntry = comp.prices.find((p) => p.supplierId === sq.supplier.id);
+      const priceEntry = comp.prices.find((p) => p.supplierId === sq.supplier!.id);
       if (priceEntry?.totalPrice) {
         totalValue += priceEntry.totalPrice;
         productsQuoted++;
       }
-      if (comp.bestPrice?.supplierId === sq.supplier.id) {
+      if (comp.bestPrice?.supplierId === sq.supplier!.id) {
         productsWithBestPrice++;
       }
     });
 
     return {
-      supplierId: sq.supplier.id,
-      supplierName: sq.supplier.supplier_name,
+      supplierId: sq.supplier!.id,
+      supplierName: sq.supplier!.supplier_name,
       totalValue,
       productsWithBestPrice,
       productsQuoted,
@@ -185,8 +178,7 @@ export const getBestPricesService = async (
     .map((c) => ({
       productId: c.productId,
       productName: c.productName,
-      totalQuantity: c.totalQuantity,
-      quantities: c.quantities,
+      quantity: c.quantity,
       bestSupplier: c.bestPrice!.supplierName,
       bestSupplierId: c.bestPrice!.supplierId,
       unitPrice: c.bestPrice!.unitPrice,

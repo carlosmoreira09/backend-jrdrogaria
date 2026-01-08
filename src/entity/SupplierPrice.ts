@@ -7,15 +7,19 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Tenant } from './Tenant';
 import { SupplierQuotation } from './SupplierQuotation';
 import { Products } from './Products';
 
 @Entity()
-@Index(['supplierQuotation', 'product'], { unique: true })
-@Index(['product'])
+@Index(['tenant', 'supplierQuotation', 'product'], { unique: true })
+@Index(['tenant', 'product'])
 export class SupplierPrice {
   @PrimaryGeneratedColumn()
   id!: number;
+
+  @ManyToOne(() => Tenant, { nullable: true })
+  tenant?: Tenant;
 
   @ManyToOne(() => SupplierQuotation, (sq) => sq.prices, { nullable: false, onDelete: 'CASCADE' })
   supplierQuotation!: SupplierQuotation;
@@ -37,10 +41,4 @@ export class SupplierPrice {
 
   @UpdateDateColumn()
   updated_at!: Date;
-
-  @Column({ nullable: true })
-  created_by?: string;
-
-  @Column({ nullable: true })
-  updated_by?: string;
 }

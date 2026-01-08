@@ -32,7 +32,11 @@ export const getQuotationDetailController = async (req: Request, res: Response):
 export const createQuotationController = async (req: Request, res: Response): Promise<void> => {
   try {
     const payload = req.body;
-    const result = await createQuotationService(payload);
+    if (!req.tenant || !req.store) {
+      res.status(400).send({ message: 'Tenant and Store are required' });
+      return;
+    }
+    const result = await createQuotationService(payload, req.tenant, req.store);
     res.status(201).send(result);
   } catch (error) {
     res.status(400).send({ message: (error as Error).message });
@@ -42,7 +46,11 @@ export const createQuotationController = async (req: Request, res: Response): Pr
 export const updateQuotationController = async (req: Request, res: Response): Promise<void> => {
   try {
     const payload = req.body;
-    const data = await updateQuotationService(Number(req.params.id), payload);
+    if (!req.tenant || !req.store) {
+      res.status(400).send({ message: 'Tenant and Store are required' });
+      return;
+    }
+    const data = await updateQuotationService(Number(req.params.id), payload, req.tenant, req.store);
     res.status(200).send({ data, message: 'Cotação atualizada.' });
   } catch (error) {
     res.status(400).send({ message: (error as Error).message });

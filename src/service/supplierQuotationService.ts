@@ -30,7 +30,7 @@ export const createSupplierQuotationsService = async (
     supplier.id = supplierId;
     sq.supplier = supplier;
     sq.quotationRequest = quotation;
-    sq.accessToken = generateSupplierToken();
+    sq.token_hash = generateSupplierToken();
     sq.status = 'pending';
     return sq;
   });
@@ -41,7 +41,7 @@ export const createSupplierQuotationsService = async (
 
 export const getSupplierQuotationByTokenService = async (token: string) => {
   return supplierQuotationRepository.findOne({
-    where: { accessToken: token },
+    where: { token_hash: token },
     relations: [
       'supplier',
       'quotationRequest',
@@ -62,7 +62,7 @@ export const saveSupplierPricesService = async (
     const productRepo = manager.getRepository(Products);
 
     const supplierQuotation = await sqRepo.findOne({
-      where: { accessToken: token },
+      where: { token_hash: token },
       relations: ['quotationRequest'],
     });
     if (!supplierQuotation) throw new Error('Link inválido');
@@ -138,7 +138,7 @@ export const saveAnonymousSupplierPricesService = async (
     const supplierQuotation = sqRepo.create({
       supplier: savedSupplier,
       quotationRequest: quotation,
-      accessToken: generateSupplierToken(),
+      token_hash: generateSupplierToken(),
       status: 'submitted',
       submitted_at: new Date(),
     });

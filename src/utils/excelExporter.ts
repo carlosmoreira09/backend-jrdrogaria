@@ -34,7 +34,7 @@ export const exportComparisonToExcel = async (
 
   // Data rows
   comparison.comparisons.forEach((comp) => {
-    const row: (string | number)[] = [comp.productName, comp.totalQuantity];
+    const row: (string | number)[] = [comp.productName, comp.quantity];
 
     comparison.supplierTotals.forEach((supplier) => {
       const priceEntry = comp.prices.find((p) => p.supplierId === supplier.supplierId);
@@ -122,11 +122,7 @@ export const exportComparisonToExcel = async (
 
   bestPricesSheet.addRow([
     'Produto',
-    'Qtd Total',
-    'JR',
-    'GS',
-    'BARÃO',
-    'LB',
+    'Quantidade',
     'Melhor Fornecedor',
     'Preço Unit.',
     'Total',
@@ -144,19 +140,15 @@ export const exportComparisonToExcel = async (
     .forEach((comp) => {
       bestPricesSheet.addRow([
         comp.productName,
-        comp.totalQuantity,
-        comp.quantities.JR,
-        comp.quantities.GS,
-        comp.quantities.BARAO,
-        comp.quantities.LB,
+        comp.quantity,
         comp.bestPrice!.supplierName,
         comp.bestPrice!.unitPrice,
         comp.bestPrice!.totalPrice,
       ]);
     });
 
-  bestPricesSheet.getColumn(8).numFmt = 'R$ #,##0.00';
-  bestPricesSheet.getColumn(9).numFmt = 'R$ #,##0.00';
+  bestPricesSheet.getColumn(4).numFmt = 'R$ #,##0.00';
+  bestPricesSheet.getColumn(5).numFmt = 'R$ #,##0.00';
   bestPricesSheet.columns.forEach((column) => {
     column.width = 15;
   });
@@ -178,8 +170,7 @@ export const exportBestPricesBySupplier = async (
     supplierName: string;
     products: {
       productName: string;
-      totalQuantity: number;
-      quantities: { JR: number; GS: number; BARAO: number; LB: number };
+      quantity: number;
       unitPrice: number;
       totalPrice: number;
     }[];
@@ -197,8 +188,7 @@ export const exportBestPricesBySupplier = async (
       }
       productsBySupplier[supplierId].products.push({
         productName: comp.productName,
-        totalQuantity: comp.totalQuantity,
-        quantities: comp.quantities,
+        quantity: comp.quantity,
         unitPrice: comp.bestPrice!.unitPrice,
         totalPrice: comp.bestPrice!.totalPrice,
       });
@@ -220,11 +210,7 @@ export const exportBestPricesBySupplier = async (
     // Column headers
     const headerRow = sheet.addRow([
       'Produto',
-      'Qtd Total',
-      'JR',
-      'GS',
-      'BARÃO',
-      'LB',
+      'Quantidade',
       'Preço Unit.',
       'Total',
     ]);
@@ -240,11 +226,7 @@ export const exportBestPricesBySupplier = async (
     supplierData.products.forEach((product) => {
       sheet.addRow([
         product.productName,
-        product.totalQuantity,
-        product.quantities.JR,
-        product.quantities.GS,
-        product.quantities.BARAO,
-        product.quantities.LB,
+        product.quantity,
         product.unitPrice,
         product.totalPrice,
       ]);
@@ -253,15 +235,15 @@ export const exportBestPricesBySupplier = async (
 
     // Total row
     sheet.addRow([]);
-    const totalRow = sheet.addRow(['', '', '', '', '', 'TOTAL:', '', grandTotal]);
+    const totalRow = sheet.addRow(['', 'TOTAL:', '', grandTotal]);
     totalRow.font = { bold: true };
-    totalRow.getCell(8).numFmt = 'R$ #,##0.00';
+    totalRow.getCell(4).numFmt = 'R$ #,##0.00';
 
     // Format columns
-    sheet.getColumn(7).numFmt = 'R$ #,##0.00';
-    sheet.getColumn(8).numFmt = 'R$ #,##0.00';
+    sheet.getColumn(3).numFmt = 'R$ #,##0.00';
+    sheet.getColumn(4).numFmt = 'R$ #,##0.00';
     sheet.getColumn(1).width = 30;
-    for (let i = 2; i <= 8; i++) {
+    for (let i = 2; i <= 4; i++) {
       sheet.getColumn(i).width = 12;
     }
   });
@@ -306,7 +288,7 @@ export const exportOrderToExcel = async (
     supplierName: string;
     items: {
       productName: string;
-      quantities: { JR: number; GS: number; BARAO: number; LB: number };
+      quantity: number;
       unitPrice: number;
       subtotal: number;
     }[];
@@ -321,7 +303,7 @@ export const exportOrderToExcel = async (
 
   // Header info
   sheet.addRow(['PEDIDO DE COMPRA']);
-  sheet.mergeCells('A1:G1');
+  sheet.mergeCells('A1:D1');
   sheet.getCell('A1').font = { bold: true, size: 16 };
   sheet.getCell('A1').alignment = { horizontal: 'center' };
 
@@ -334,10 +316,7 @@ export const exportOrderToExcel = async (
   // Items header
   const itemsHeader = sheet.addRow([
     'Produto',
-    'JR',
-    'GS',
-    'BARÃO',
-    'LB',
+    'Quantidade',
     'Preço Unit.',
     'Subtotal',
   ]);
@@ -352,10 +331,7 @@ export const exportOrderToExcel = async (
   order.items.forEach((item) => {
     sheet.addRow([
       item.productName,
-      item.quantities.JR,
-      item.quantities.GS,
-      item.quantities.BARAO,
-      item.quantities.LB,
+      item.quantity,
       item.unitPrice,
       item.subtotal,
     ]);
@@ -363,15 +339,15 @@ export const exportOrderToExcel = async (
 
   // Total
   sheet.addRow([]);
-  const totalRow = sheet.addRow(['', '', '', '', 'TOTAL:', '', order.totalValue]);
+  const totalRow = sheet.addRow(['', 'TOTAL:', '', order.totalValue]);
   totalRow.font = { bold: true };
-  totalRow.getCell(7).numFmt = 'R$ #,##0.00';
+  totalRow.getCell(4).numFmt = 'R$ #,##0.00';
 
   // Format columns
-  sheet.getColumn(6).numFmt = 'R$ #,##0.00';
-  sheet.getColumn(7).numFmt = 'R$ #,##0.00';
+  sheet.getColumn(3).numFmt = 'R$ #,##0.00';
+  sheet.getColumn(4).numFmt = 'R$ #,##0.00';
   sheet.getColumn(1).width = 30;
-  for (let i = 2; i <= 7; i++) {
+  for (let i = 2; i <= 4; i++) {
     sheet.getColumn(i).width = 12;
   }
 

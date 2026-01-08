@@ -1,6 +1,7 @@
 export interface TokenPayload {
     userId: number;
     tenantId?: number;
-    role: string;
+    tenantSlug?: string;
     tenantName?: string;
+    role: string;
 }

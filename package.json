@@ -10,7 +10,13 @@
     "start:prod": "NODE_ENV=production node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "audit-fix": "npm audit fix --force",
-    "health-check": "node scripts/health-check.js"
+    "health-check": "node scripts/health-check.js",
+    "fix-schema": "ts-node -r dotenv/config src/scripts/fix-schema.ts",
+    "migrate-slugs": "ts-node -r dotenv/config src/scripts/migrate-tenant-slugs.ts",
+    "migrate-data": "ts-node -r dotenv/config src/scripts/full-migration.ts",
+    "migrate-schema": "ts-node -r dotenv/config src/scripts/run-migration.ts",
+    "drop-tables": "ts-node -r dotenv/config src/scripts/drop-tables.ts",
+    "seed": "ts-node -r dotenv/config src/scripts/seed-data.ts"
   },
   "keywords": [],
   "author": "Carlos Moreira",

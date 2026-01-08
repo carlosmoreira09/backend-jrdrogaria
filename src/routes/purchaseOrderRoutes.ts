@@ -1,16 +1,19 @@
+/**
+ * Purchase Order Routes v1 - Legacy (retrocompatível)
+ * Não requer headers X-Tenant-Slug ou X-Store-Id
+ */
+
 import { Router } from 'express';
 import {
-  createPurchaseOrderController,
-  deletePurchaseOrderController,
-  exportPurchaseOrderController,
-  generateOrdersController,
-  getPurchaseOrderDetailController,
-  listPurchaseOrdersController,
-  updatePurchaseOrderItemsController,
-  updatePurchaseOrderStatusController,
-} from '../controller/purchaseOrderController';
+  createOrderControllerLegacy,
+  exportOrderControllerLegacy,
+  generateOrdersControllerLegacy,
+  getOrderDetailControllerLegacy,
+  listOrdersControllerLegacy,
+  updateOrderItemsControllerLegacy,
+  updateOrderStatusControllerLegacy,
+} from '../controller/legacy/purchaseOrderController.legacy';
 import { authMiddleware } from '../middlewares/authMiddleware';
-import { tenantMiddleware } from '../middlewares/tenantMiddleware';
 import { validateOrderCreate, validateOrderStatus, validateIdParam } from '../middlewares/validators';
 import { param } from 'express-validator';
 import { handleValidationErrors } from '../middlewares/validators';
@@ -22,13 +25,13 @@ const validateQuotationIdParam = [
 
 const router = Router();
 
-router.get('/', authMiddleware, tenantMiddleware, listPurchaseOrdersController);
-router.get('/:id', authMiddleware, tenantMiddleware, validateIdParam, getPurchaseOrderDetailController);
-router.post('/', authMiddleware, tenantMiddleware, validateOrderCreate, createPurchaseOrderController);
-router.post('/generate/:quotationId', authMiddleware, tenantMiddleware, validateQuotationIdParam, generateOrdersController);
-router.put('/:id/items', authMiddleware, tenantMiddleware, validateIdParam, updatePurchaseOrderItemsController);
-router.put('/:id/status', authMiddleware, tenantMiddleware, validateOrderStatus, updatePurchaseOrderStatusController);
-router.delete('/:id', authMiddleware, tenantMiddleware, validateIdParam, deletePurchaseOrderController);
-router.get('/:id/export', authMiddleware, tenantMiddleware, validateIdParam, exportPurchaseOrderController);
+// v1 Legacy Routes - sem multi-tenant
+router.get('/', authMiddleware, listOrdersControllerLegacy);
+router.get('/:id', authMiddleware, validateIdParam, getOrderDetailControllerLegacy);
+router.post('/', authMiddleware, validateOrderCreate, createOrderControllerLegacy);
+router.post('/generate/:quotationId', authMiddleware, validateQuotationIdParam, generateOrdersControllerLegacy);
+router.put('/:id/items', authMiddleware, validateIdParam, updateOrderItemsControllerLegacy);
+router.put('/:id/status', authMiddleware, validateOrderStatus, updateOrderStatusControllerLegacy);
+router.get('/:id/export', authMiddleware, validateIdParam, exportOrderControllerLegacy);
 
 export default router;

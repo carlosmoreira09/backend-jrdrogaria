@@ -8,6 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Tenant } from './Tenant';
+import { Store } from './Store';
 import { QuotationRequest } from './QuotationRequest';
 import { Supplier } from './Supplier';
 import { SupplierPrice } from './SupplierPrice';
@@ -15,19 +17,34 @@ import { SupplierPrice } from './SupplierPrice';
 export type SupplierQuotationStatus = 'pending' | 'in_progress' | 'submitted';
 
 @Entity()
-@Index(['status'])
+@Index(['token_hash'], { unique: true })
+@Index(['tenant', 'store', 'quotationRequest'])
+@Index(['tenant', 'store', 'supplier'])
+@Index(['tenant', 'store', 'status'])
 export class SupplierQuotation {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ unique: true })
-  accessToken!: string;
+  @ManyToOne(() => Tenant, { nullable: true })
+  tenant?: Tenant;
+
+  @ManyToOne(() => Store, { nullable: true })
+  store?: Store;
+
+  @Column()
+  token_hash!: string;
+
+  @Column({ type: 'datetime', nullable: true })
+  expires_at?: Date;
+
+  @Column({ type: 'datetime', nullable: true })
+  revoked_at?: Date;
 
   @ManyToOne(() => QuotationRequest, (qr) => qr.supplierQuotations, { nullable: false, onDelete: 'CASCADE' })
   quotationRequest!: QuotationRequest;
 
-  @ManyToOne(() => Supplier, { nullable: false })
-  supplier!: Supplier;
+  @ManyToOne(() => Supplier, { nullable: true })
+  supplier?: Supplier;
 
   @Column({ type: 'enum', enum: ['pending', 'in_progress', 'submitted'], default: 'pending' })
   status!: SupplierQuotationStatus;
@@ -43,10 +60,4 @@ export class SupplierQuotation {
 
   @UpdateDateColumn()
   updated_at!: Date;
-
-  @Column({ nullable: true })
-  created_by?: string;
-
-  @Column({ nullable: true })
-  updated_by?: string;
 }

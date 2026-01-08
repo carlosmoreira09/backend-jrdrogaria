@@ -130,7 +130,7 @@ export const exportPurchaseOrderController = async (req: Request, res: Response)
       supplierName: order.supplier?.supplier_name || 'Fornecedor',
       items: order.items.map((item) => ({
         productName: item.product?.product_name || `Produto ${item.product?.id}`,
-        quantities: item.quantities,
+        quantity: Number(item.quantity),
         unitPrice: Number(item.unitPrice),
         subtotal: Number(item.subtotal),
       })),
