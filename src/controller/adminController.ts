@@ -14,6 +14,8 @@ import {
   updateTenantPlanService,
   createTenantService,
   getAuditLogsService,
+  resetTenantOwnerPasswordService,
+  impersonateTenantService,
 } from '../service/adminService';
 
 export const adminLoginController = async (req: Request, res: Response): Promise<void> => {
@@ -178,6 +180,43 @@ export const getAuditLogsController = async (req: Request, res: Response): Promi
     res.status(200).json(result);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const impersonateTenantController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({ error: 'Admin authentication required' });
+      return;
+    }
+
+    const tenantId = parseInt(req.params.id);
+    const result = await impersonateTenantService(tenantId, req.admin);
+    res.status(200).json({ data: result });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const resetTenantPasswordController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.admin) {
+      res.status(401).json({ error: 'Admin authentication required' });
+      return;
+    }
+
+    const tenantId = parseInt(req.params.id);
+    const { newPassword } = req.body;
+
+    if (!newPassword || newPassword.length < 6) {
+      res.status(400).json({ error: 'Password must be at least 6 characters' });
+      return;
+    }
+
+    const result = await resetTenantOwnerPasswordService(tenantId, newPassword, req.admin);
+    res.status(200).json({ data: result, message: 'Password reset successfully' });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
   }
 };
 

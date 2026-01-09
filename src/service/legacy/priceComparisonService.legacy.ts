@@ -11,6 +11,7 @@ export type PriceComparisonLegacy = {
   productId: number;
   productName: string;
   quantity: number;
+  totalQuantity: number;
   prices: {
     supplierId: number;
     supplierName: string;
@@ -31,6 +32,9 @@ export type PriceComparisonLegacy = {
 export type ComparisonSummaryLegacy = {
   quotationId: number;
   quotationName: string;
+  totalProducts: number;
+  respondedSuppliers: number;
+  totalSuppliers: number;
   comparisons: PriceComparisonLegacy[];
   supplierTotals: {
     supplierId: number;
@@ -119,10 +123,12 @@ export const getPriceComparisonServiceLegacy = async (
       };
     }
 
+    const qty = Number(item.quantity) || 0;
     return {
       productId: item.product.id,
       productName: item.product.product_name,
-      quantity: Number(item.quantity) || 0,
+      quantity: qty,
+      totalQuantity: qty,
       prices,
       bestPrice,
     };
@@ -161,6 +167,9 @@ export const getPriceComparisonServiceLegacy = async (
   return {
     quotationId: quotation.id,
     quotationName: quotation.name,
+    totalProducts: comparisons.length,
+    respondedSuppliers: submittedQuotations.length,
+    totalSuppliers: (quotation.supplierQuotations || []).length,
     comparisons,
     supplierTotals,
     maxSavings,

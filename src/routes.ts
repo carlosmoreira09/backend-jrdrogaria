@@ -25,6 +25,9 @@ import authRoutesV3 from "./routes/v3/authRoutes.v3";
 // Admin Panel Routes
 import adminRoutes from "./routes/adminRoutes";
 
+// Billing Routes
+import billingRoutes from "./routes/billingRoutes";
+
 import {loggingMiddleware} from "./middlewares/loggingMiddleware";
 import { swaggerSpec } from "./config/swagger";
 
@@ -63,6 +66,7 @@ app.use('/api/v3/orders', purchaseOrderRoutesV3);
 app.use('/api/v3/products', productRoutesV3);
 app.use('/api/v3/suppliers', supplierRoutesV3);
 app.use('/api/v3/stores', storeRoutesV3);
+app.use('/api/v3/billing', billingRoutes);
 
 // =============================================
 // Admin Panel API - Gestão do SaaS

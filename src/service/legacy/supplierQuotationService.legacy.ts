@@ -60,6 +60,13 @@ export const getSupplierQuotationByTokenServiceLegacy = async (token: string) =>
   });
 };
 
+export const getOpenQuotationByIdServiceLegacy = async (quotationId: number) => {
+  return quotationRepository.findOne({
+    where: { id: quotationId },
+    relations: ['items', 'items.product'],
+  });
+};
+
 export type SupplierPricePayload = {
   productId: number;
   unitPrice: number | null;
@@ -145,6 +152,58 @@ export const submitPublicQuotationServiceLegacy = async (
     if (!existingQuotation) throw new Error('Token inválido');
 
     const quotation = existingQuotation.quotationRequest;
+
+    const newSupplier = supplierRepo.create({
+      supplier_name: supplierData.supplierName,
+      whatsAppNumber: supplierData.whatsAppNumber || '',
+      payment_term: supplierData.paymentTerm || 'A combinar',
+      tenant: tenant || undefined,
+    });
+    const savedSupplier = await supplierRepo.save(newSupplier);
+
+    const supplierQuotation = sqRepo.create({
+      supplier: savedSupplier,
+      quotationRequest: quotation,
+      token_hash: generateSupplierToken(),
+      status: 'submitted',
+      submitted_at: new Date(),
+      tenant: tenant || undefined,
+    });
+    const savedSQ = await sqRepo.save(supplierQuotation);
+
+    const priceEntities: SupplierPrice[] = prices.map((p) => {
+      const sp = new SupplierPrice();
+      sp.supplierQuotation = savedSQ;
+      const product = productRepo.create({ id: p.productId });
+      sp.product = product;
+      sp.unitPrice = p.unitPrice ?? undefined;
+      sp.available = p.available;
+      sp.observation = p.observation;
+      sp.tenant = tenant || undefined;
+      return sp;
+    });
+
+    await spRepo.save(priceEntities);
+
+    return { supplier: savedSupplier, supplierQuotation: savedSQ };
+  });
+};
+
+export const submitOpenQuotationServiceLegacy = async (
+  quotationId: number,
+  supplierData: PublicQuotationSupplierData,
+  prices: SupplierPricePayload[],
+) => {
+  const tenant = await getDefaultTenant();
+  
+  return AppDataSource.transaction(async (manager) => {
+    const sqRepo = manager.getRepository(SupplierQuotation);
+    const spRepo = manager.getRepository(SupplierPrice);
+    const supplierRepo = manager.getRepository(Supplier);
+    const productRepo = manager.getRepository(Products);
+
+    const quotation = await quotationRepository.findOne({ where: { id: quotationId } });
+    if (!quotation) throw new Error('Cotação não encontrada');
 
     const newSupplier = supplierRepo.create({
       supplier_name: supplierData.supplierName,

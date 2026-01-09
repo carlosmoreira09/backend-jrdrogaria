@@ -8,6 +8,8 @@ import {
   getQuotationByTokenControllerLegacy, 
   savePricesControllerLegacy,
   submitPublicQuotationControllerLegacy,
+  getOpenQuotationControllerLegacy,
+  submitOpenQuotationControllerLegacy,
 } from '../controller/legacy/publicController.legacy';
 import { publicRateLimiter, submitRateLimiter } from '../middlewares/rateLimitMiddleware';
 import { validatePublicPrices } from '../middlewares/validators';
@@ -20,5 +22,9 @@ router.post('/quotation/:token/prices', submitRateLimiter, validatePublicPrices,
 
 // Routes for anonymous suppliers
 router.post('/quotation/:token/submit', submitRateLimiter, submitPublicQuotationControllerLegacy);
+
+// Open quotation routes (any supplier can access by quotation ID)
+router.get('/quotation-open/:id', publicRateLimiter, getOpenQuotationControllerLegacy);
+router.post('/quotation-open/:id/submit', submitRateLimiter, submitOpenQuotationControllerLegacy);
 
 export default router;

@@ -15,6 +15,8 @@ import {
   updateTenantPlanController,
   createTenantController,
   getAuditLogsController,
+  resetTenantPasswordController,
+  impersonateTenantController,
   healthCheckController,
 } from '../controller/adminController';
 import { adminAuthMiddleware, requireAdminRole } from '../middleware/adminAuthMiddleware';
@@ -35,6 +37,8 @@ router.post('/tenants', requireAdminRole(['super_admin']), createTenantControlle
 router.get('/tenants/:id', getTenantDetailsController);
 router.put('/tenants/:id/status', requireAdminRole(['super_admin', 'support']), updateTenantStatusController);
 router.put('/tenants/:id/plan', requireAdminRole(['super_admin', 'billing']), updateTenantPlanController);
+router.post('/tenants/:id/reset-password', requireAdminRole(['super_admin']), resetTenantPasswordController);
+router.post('/tenants/:id/impersonate', requireAdminRole(['super_admin', 'support']), impersonateTenantController);
 
 router.get('/admin-users', requireAdminRole(['super_admin']), listAdminUsersController);
 router.post('/admin-users', requireAdminRole(['super_admin']), createAdminUserController);

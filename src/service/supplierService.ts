@@ -2,40 +2,54 @@
 import {supplierRepository} from "../repository/supplierRepository";
 import {Supplier} from "../entity/Supplier";
 
-export const findProductById = async (id: number) => {
+export const findProductById = async (id: number, tenantId: number) => {
     return await supplierRepository.findOne({ where: {
-            id: id
+            id: id,
+            tenant: {
+                id: tenantId
+            }
         },
         relations: ['tenants']
     })
 }
 
-export const listSupplierService = async () => {
-    return await supplierRepository.find()
+export const listSupplierService = async (tenantId: number) => {
+    return await supplierRepository.find({
+        where: {
+            tenant: {
+                id: tenantId
+            }
+        }
+    })
 }
 
-export const createSupplierService = async(supplier: Supplier) => {
+export const createSupplierService = async(supplier: Supplier, tenantId: number) => {
 
-    const newSupplier = supplierRepository.create(supplier)
+    const newSupplier = supplierRepository.create({...supplier, tenant: {
+        id: tenantId
+        }})
     await supplierRepository.save(newSupplier)
     return { message: 'Fornecedor adicionado'}
 }
 
-export const updateSupplierService = async (product: Supplier) => {
-    const updateProduct = await supplierRepository.update({id: product.id}, product)
+export const updateSupplierService = async (supplier: Supplier, tenantId: number) => {
+    const updateProduct = await supplierRepository.update({id: supplier.id}, supplier)
     if(updateProduct.affected == 0) {
         throw new Error('Erro ao atualizar fornecedor')
     }
     return { message: 'Fornecedor atualizado '}
 }
 
-export const deleteSupplierService = async (id_supplier: number) => {
-    return await supplierRepository.delete({id: id_supplier})
+export const deleteSupplierService = async (id_supplier: number,tenantId: number) => {
+    return await supplierRepository.delete({id: id_supplier,tenant: { id: tenantId }})
 }
 
-export const findSupplierById = async (id: number) => {
+export const findSupplierById = async (id: number, tenantId: number) => {
     return await supplierRepository.findOne({ where: {
-            id: id
+            id: id,
+            tenant: {
+                id: tenantId
+            }
         },
     })
 }

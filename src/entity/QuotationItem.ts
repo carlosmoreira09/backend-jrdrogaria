@@ -36,6 +36,18 @@ export class QuotationItem {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   quantity!: number;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  qty_jr?: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  qty_gs?: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  qty_barao?: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  qty_lb?: number;
+
   @Column({ nullable: true })
   notes?: string;
 

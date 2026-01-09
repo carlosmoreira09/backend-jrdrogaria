@@ -9,6 +9,8 @@ import {
   getSupplierQuotationByTokenServiceLegacy,
   saveSupplierPricesServiceLegacy,
   submitPublicQuotationServiceLegacy,
+  getOpenQuotationByIdServiceLegacy,
+  submitOpenQuotationServiceLegacy,
 } from '../../service/legacy/supplierQuotationService.legacy';
 
 export const getQuotationByTokenControllerLegacy = async (req: Request, res: Response): Promise<void> => {
@@ -45,6 +47,34 @@ export const submitPublicQuotationControllerLegacy = async (req: Request, res: R
     const { supplierData, prices } = req.body;
     
     const data = await submitPublicQuotationServiceLegacy(token, supplierData, prices);
+    res.status(201).send({ data, message: 'Cotação enviada com sucesso!' });
+  } catch (error) {
+    res.status(400).send({ message: (error as Error).message });
+  }
+};
+
+export const getOpenQuotationControllerLegacy = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const quotationId = Number(req.params.id);
+    const data = await getOpenQuotationByIdServiceLegacy(quotationId);
+    
+    if (!data) {
+      res.status(404).send({ message: 'Cotação não encontrada' });
+      return;
+    }
+
+    res.status(200).send({ data, message: 'Cotação encontrada.' });
+  } catch (error) {
+    res.status(400).send({ message: (error as Error).message });
+  }
+};
+
+export const submitOpenQuotationControllerLegacy = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const quotationId = Number(req.params.id);
+    const { supplier, prices } = req.body;
+    
+    const data = await submitOpenQuotationServiceLegacy(quotationId, supplier, prices);
     res.status(201).send({ data, message: 'Cotação enviada com sucesso!' });
   } catch (error) {
     res.status(400).send({ message: (error as Error).message });

@@ -29,24 +29,39 @@ export const getProductDetailsController = async (req: Request, res: Response) =
 }
 export const createProductController = async (req: Request, res: Response) => {
     try {
-        const productData: Products = req.body;
+        const productData: Partial<Products> = req.body;
+        const tenantId = req.tenantId;
 
-        const result = await createProductService(productData)
+        if (!tenantId) {
+            res.status(400).send({ error: 'Tenant não identificado' });
+            return;
+        }
+
+        const result = await createProductService(productData, tenantId);
 
         res.send( { data: result, message: 'Produto cadastrado.' }).status(201)
     } catch (error) {
+        console.error('Erro ao criar produto:', error);
         res.sendStatus(400)
     }
 }
 export const createMultipleProductController = async (req: Request, res: Response) => {
     try {
-        const productData: Products[] = req.body;
-        productData.map( async (product) => {
-            await createProductService(product)
-        } )
+        const productData: Partial<Products>[] = req.body;
+        const tenantId = req.tenantId;
+
+        if (!tenantId) {
+            res.status(400).send({ error: 'Tenant não identificado' });
+            return;
+        }
+
+        for (const product of productData) {
+            await createProductService(product, tenantId);
+        }
 
         res.send( { message: 'Produtos cadastrados.' }).status(201)
     } catch (error) {
+        console.error('Erro ao criar produtos:', error);
         res.sendStatus(400)
     }
 }

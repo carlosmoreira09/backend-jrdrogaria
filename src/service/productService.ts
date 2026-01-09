@@ -17,17 +17,22 @@ export const listProductsService = async () => {
     })
 }
 
-export const createProductService = async(product: Products) => {
+export const createProductService = async(product: Partial<Products>, tenantId?: number) => {
 
-    const checkProduct = await productsRepository.findOne( {
-        where: {
-            product_name: product.product_name
-        },
-        })
+    const whereClause: any = { product_name: product.product_name };
+    if (tenantId) {
+        whereClause.tenant = { id: tenantId };
+    }
+
+    const checkProduct = await productsRepository.findOne({ where: whereClause });
     if(checkProduct) {
         return { message:  'Produto já adicionado '}
     }
-    const newProduct = productsRepository.create(product)
+
+    const newProduct = productsRepository.create({
+        ...product,
+        tenant: tenantId ? { id: tenantId } as any : undefined
+    });
     await productsRepository.save(newProduct)
     return { message: 'Produto adicionado'}
 }

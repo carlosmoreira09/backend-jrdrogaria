@@ -6,15 +6,16 @@ import {
     updateProductController
 } from "../controller/productController";
 import {authMiddleware} from "../middlewares/authMiddleware";
+import {tenantMiddleware} from "../middlewares/tenantMiddleware";
 
 
 const router = Router();
 
-router.post('/', authMiddleware, createProductController)
-router.post('/multiple', authMiddleware, createMultipleProductController)
-router.get('/', authMiddleware, listProductsController)
-router.put('/', authMiddleware, updateProductController)
-router.delete('/:id', authMiddleware, deleteProductController)
-router.get('/:id', authMiddleware, getProductDetailsController)
+router.post('/', authMiddleware,tenantMiddleware, createProductController)
+router.post('/multiple', authMiddleware, tenantMiddleware,createMultipleProductController)
+router.get('/', authMiddleware,tenantMiddleware, listProductsController)
+router.put('/', authMiddleware, tenantMiddleware,updateProductController)
+router.delete('/:id', authMiddleware, tenantMiddleware,deleteProductController)
+router.get('/:id', authMiddleware, tenantMiddleware,getProductDetailsController)
 
 export default router;

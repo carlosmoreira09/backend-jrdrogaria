@@ -4,6 +4,7 @@
  */
 
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../config/database';
 import { AdminUser } from '../entity/AdminUser';
 import { AdminAuditLog } from '../entity/AdminAuditLog';
@@ -337,6 +338,95 @@ export const getAuditLogsService = async (filters?: {
     limit,
     totalPages: Math.ceil(total / limit),
   };
+};
+
+export const impersonateTenantService = async (
+  tenantId: number,
+  admin: AdminUser
+) => {
+  const tenantRepository = getTenantRepository();
+  const userRepository = getUserRepository();
+  
+  const tenant = await tenantRepository.findOne({ where: { id: tenantId } });
+  if (!tenant) {
+    throw new Error('Tenant not found');
+  }
+
+  const owner = await userRepository.findOne({
+    where: { tenant: { id: tenantId }, role: 'tenant_owner' },
+    relations: ['tenant'],
+  });
+
+  if (!owner) {
+    throw new Error('Tenant owner not found');
+  }
+
+  const token = jwt.sign(
+    {
+      id: owner.id,
+      email: owner.email,
+      role: owner.role,
+      tenant_id: tenant.id,
+      impersonated_by: admin.id,
+    },
+    process.env.JWT_SECRET || 'default_secret',
+    { expiresIn: '2h' }
+  );
+
+  await logAdminAction(admin, 'tenant.impersonate', {
+    tenant_id: tenantId,
+    user_id: owner.id,
+    user_email: owner.email,
+  }, tenant);
+
+  return {
+    token,
+    user: {
+      id: owner.id,
+      email: owner.email,
+      fullName: owner.fullName,
+      role: owner.role,
+    },
+    tenant: {
+      id: tenant.id,
+      name: tenant.name,
+      slug: tenant.slug,
+    },
+  };
+};
+
+export const resetTenantOwnerPasswordService = async (
+  tenantId: number,
+  newPassword: string,
+  admin: AdminUser
+) => {
+  const tenantRepository = getTenantRepository();
+  const userRepository = getUserRepository();
+  
+  const tenant = await tenantRepository.findOne({ where: { id: tenantId } });
+  if (!tenant) {
+    throw new Error('Tenant not found');
+  }
+
+  const owner = await userRepository.findOne({
+    where: { tenant: { id: tenantId }, role: 'tenant_owner' },
+  });
+
+  if (!owner) {
+    throw new Error('Tenant owner not found');
+  }
+
+  const password_hash = await bcrypt.hash(newPassword, 10);
+  owner.password = password_hash;
+  await userRepository.save(owner);
+
+  await logAdminAction(admin, 'tenant.password_reset', {
+    tenant_id: tenantId,
+    user_id: owner.id,
+    user_email: owner.email,
+  }, tenant);
+
+  return { success: true, email: owner.email };
 };
 
 async function logAdminAction(
