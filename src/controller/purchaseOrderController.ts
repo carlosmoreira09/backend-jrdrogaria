@@ -61,7 +61,8 @@ export const generateOrdersController = async (req: Request, res: Response): Pro
   }
   try {
     const quotationId = Number(req.params.quotationId);
-    const data = await generateOrdersFromBestPricesService(quotationId, tenantId);
+    const { orderItems } = req.body || {};
+    const data = await generateOrdersFromBestPricesService(quotationId, tenantId, orderItems);
     res.status(201).send({ data, message: 'Pedidos gerados a partir dos melhores preços.' });
   } catch (error) {
     res.status(400).send({ message: (error as Error).message });
@@ -131,6 +132,8 @@ export const exportPurchaseOrderController = async (req: Request, res: Response)
       items: order.items.map((item) => ({
         productName: item.product?.product_name || `Produto ${item.product?.id}`,
         quantities: item.quantities,
+        orderQuantity: item.orderQuantity,
+        targetStore: item.targetStore,
         unitPrice: Number(item.unitPrice),
         subtotal: Number(item.subtotal),
       })),

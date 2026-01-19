@@ -14,8 +14,8 @@ const router = Router();
 router.get('/quotation/:token', publicRateLimiter, getPublicQuotationController);
 router.post('/quotation/:token/prices', submitRateLimiter, validatePublicPrices, savePublicPricesController);
 
-// Routes for anonymous suppliers
-router.get('/quotation-open/:id', publicRateLimiter, getQuotationForAnonymousController);
-router.post('/quotation-open/:id/submit', submitRateLimiter, saveAnonymousSupplierPricesController);
+// Routes for anonymous suppliers (using public_token)
+router.get('/quotation-open/:token', publicRateLimiter, getQuotationForAnonymousController);
+router.post('/quotation-open/:token/submit', submitRateLimiter, saveAnonymousSupplierPricesController);
 
 export default router;

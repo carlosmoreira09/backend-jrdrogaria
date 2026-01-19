@@ -30,6 +30,9 @@ export class QuotationRequest {
   @Column({ type: 'datetime', nullable: true })
   deadline?: Date;
 
+  @Column({ nullable: true, unique: true })
+  public_token?: string;
+
   @ManyToOne(() => Tenant, { nullable: true })
   tenant?: Tenant;
 

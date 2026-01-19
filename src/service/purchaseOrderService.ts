@@ -14,6 +14,8 @@ export type CreateOrderPayload = {
   items: {
     productId: number;
     quantities: { JR: number; GS: number; BARAO: number; LB: number };
+    orderQuantity: number;
+    targetStore?: string;
     unitPrice: number;
   }[];
 };
@@ -62,14 +64,11 @@ export const createPurchaseOrderService = async (
       product.id = item.productId;
       orderItem.product = product;
       orderItem.quantities = item.quantities;
+      orderItem.orderQuantity = item.orderQuantity;
+      orderItem.targetStore = item.targetStore;
       orderItem.unitPrice = item.unitPrice;
 
-      const totalQty =
-        item.quantities.JR +
-        item.quantities.GS +
-        item.quantities.BARAO +
-        item.quantities.LB;
-      orderItem.subtotal = totalQty * item.unitPrice;
+      orderItem.subtotal = item.orderQuantity * item.unitPrice;
       totalValue += orderItem.subtotal;
 
       return orderItem;
@@ -86,11 +85,34 @@ export const createPurchaseOrderService = async (
     return { data: savedOrder, message: 'Pedido criado' };
   });
 };
+export const findOneOrderByQuotation = async (quotationId: number)=> {
+  return await purchaseOrderRepository.findOne({
+    where: {
+      quotationRequest: {
+        id: quotationId
+      }
+    }
+  })
+}
+
+export type OrderItemConfig = {
+  productId: number;
+  quantity: number;
+  supplierId: number;
+  supplierName: string;
+  unitPrice: number;
+  targetStore?: string;
+};
 
 export const generateOrdersFromBestPricesService = async (
   quotationId: number,
-  tenantId: number
+  tenantId: number,
+  orderItems?: OrderItemConfig[]
 ) => {
+  // const checkQuotationExists = await findOneOrderByQuotation(quotationId);
+  // if(checkQuotationExists) {
+  //   return checkQuotationExists
+  // }
   const bestPrices = await getBestPricesService(quotationId);
 
   const ordersBySupplier = new Map<
@@ -102,30 +124,52 @@ export const generateOrdersFromBestPricesService = async (
         productId: number;
         productName: string;
         quantities: { JR: number; GS: number; BARAO: number; LB: number };
+        orderQuantity: number;
+        targetStore?: string;
         unitPrice: number;
       }[];
     }
   >();
 
   for (const bp of bestPrices) {
-    if (!ordersBySupplier.has(bp.bestSupplierId)) {
-      ordersBySupplier.set(bp.bestSupplierId, {
-        supplierId: bp.bestSupplierId,
-        supplierName: bp.bestSupplier,
+    // Check if there's custom config for this product
+    const customConfig = orderItems?.find(item => item.productId === bp.productId);
+    
+    // Use custom quantity or skip if 0
+    const orderQty = customConfig?.quantity ?? 0;
+    if (orderQty <= 0) {
+      continue;
+    }
+
+    // Use custom supplier/price or best price
+    const supplierId = customConfig?.supplierId ?? bp.bestSupplierId;
+    const supplierName = customConfig?.supplierName ?? bp.bestSupplier;
+    const unitPrice = customConfig?.unitPrice ?? bp.unitPrice;
+    const targetStore = customConfig?.targetStore;
+
+    if (!ordersBySupplier.has(supplierId)) {
+      ordersBySupplier.set(supplierId, {
+        supplierId,
+        supplierName,
         items: [],
       });
     }
-    ordersBySupplier.get(bp.bestSupplierId)!.items.push({
+
+    ordersBySupplier.get(supplierId)!.items.push({
       productId: bp.productId,
       productName: bp.productName,
       quantities: bp.quantities,
-      unitPrice: bp.unitPrice,
+      orderQuantity: orderQty,
+      targetStore,
+      unitPrice,
     });
   }
 
   const orders: PurchaseOrder[] = [];
 
   for (const [, orderData] of ordersBySupplier) {
+    if (orderData.items.length === 0) continue;
+    
     const result = await createPurchaseOrderService(
       {
         quotationId,

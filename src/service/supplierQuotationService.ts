@@ -95,10 +95,10 @@ export const submitSupplierQuotationService = async (token: string) => {
   return saveSupplierPricesService(token, [], true);
 };
 
-// Get quotation by ID for anonymous supplier access
-export const getQuotationForAnonymousService = async (quotationId: number) => {
+// Get quotation by public_token for anonymous supplier access
+export const getQuotationForAnonymousService = async (publicToken: string) => {
   return quotationRepository.findOne({
-    where: { id: quotationId },
+    where: { public_token: publicToken },
     relations: ['items', 'items.product'],
   });
 };
@@ -111,7 +111,7 @@ export type AnonymousSupplierData = {
 };
 
 export const saveAnonymousSupplierPricesService = async (
-  quotationId: number,
+  publicToken: string,
   supplierData: AnonymousSupplierData,
   prices: SupplierPricePayload[],
 ) => {
@@ -122,8 +122,8 @@ export const saveAnonymousSupplierPricesService = async (
     const quotationRepo = manager.getRepository(require('../entity/QuotationRequest').QuotationRequest);
     const productRepo = manager.getRepository(Products);
 
-    // Get quotation
-    const quotation = await quotationRepo.findOne({ where: { id: quotationId } });
+    // Get quotation by public_token
+    const quotation = await quotationRepo.findOne({ where: { public_token: publicToken } });
     if (!quotation) throw new Error('Cotação não encontrada');
 
     // Create new supplier

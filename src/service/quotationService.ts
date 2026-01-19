@@ -3,6 +3,9 @@ import { QuotationRequest } from '../entity/QuotationRequest';
 import { QuotationItem } from '../entity/QuotationItem';
 import { Products } from '../entity/Products';
 import { AppDataSource } from '../config/database';
+import crypto from 'crypto';
+
+export const generatePublicToken = () => crypto.randomBytes(16).toString('hex');
 
 export type CreateQuotationPayload = {
   name: string;
@@ -15,6 +18,7 @@ export const createQuotationService = async (payload: CreateQuotationPayload) =>
   quotation.name = payload.name;
   quotation.deadline = payload.deadline;
   quotation.status = 'draft';
+  quotation.public_token = generatePublicToken();
 
   if (payload.items?.length) {
     quotation.items = payload.items.map((i) => {
@@ -40,10 +44,18 @@ export const listQuotationsService = async () => {
 };
 
 export const getQuotationDetailService = async (id: number) => {
-  return quotationRepository.findOne({
+  const quotation = await quotationRepository.findOne({
     where: { id },
     relations: ['items', 'items.product', 'supplierQuotations', 'supplierQuotations.supplier'],
   });
+  
+  // Generate public_token for existing quotations that don't have one
+  if (quotation && !quotation.public_token) {
+    quotation.public_token = generatePublicToken();
+    await quotationRepository.save(quotation);
+  }
+  
+  return quotation;
 };
 
 export const updateQuotationService = async (

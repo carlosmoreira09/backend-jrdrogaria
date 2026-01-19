@@ -32,17 +32,17 @@ export const savePublicPricesController = async (req: Request, res: Response): P
   }
 };
 
-// Get quotation by ID for anonymous supplier
+// Get quotation by public_token for anonymous supplier
 export const getQuotationForAnonymousController = async (req: Request, res: Response): Promise<void> => {
   try {
-    const quotationId = parseInt(req.params.id, 10);
-    if (isNaN(quotationId)) {
-      res.status(400).send({ message: 'ID inválido' });
+    const token = req.params.token;
+    if (!token) {
+      res.status(400).send({ message: 'Token inválido' });
       return;
     }
-    const data = await getQuotationForAnonymousService(quotationId);
+    const data = await getQuotationForAnonymousService(token);
     if (!data) {
-      res.status(404).send({ message: 'Cotação não encontrada.' });
+      res.status(404).send({ message: 'Link inválido ou expirado.' });
       return;
     }
     res.status(200).send({ data, message: 'Dados da cotação.' });
@@ -54,9 +54,9 @@ export const getQuotationForAnonymousController = async (req: Request, res: Resp
 // Save anonymous supplier prices
 export const saveAnonymousSupplierPricesController = async (req: Request, res: Response): Promise<void> => {
   try {
-    const quotationId = parseInt(req.params.id, 10);
-    if (isNaN(quotationId)) {
-      res.status(400).send({ message: 'ID inválido' });
+    const token = req.params.token;
+    if (!token) {
+      res.status(400).send({ message: 'Token inválido' });
       return;
     }
     const { supplier, prices } = req.body;
@@ -64,7 +64,7 @@ export const saveAnonymousSupplierPricesController = async (req: Request, res: R
       res.status(400).send({ message: 'Nome do fornecedor é obrigatório' });
       return;
     }
-    const result = await saveAnonymousSupplierPricesService(quotationId, supplier, prices ?? []);
+    const result = await saveAnonymousSupplierPricesService(token, supplier, prices ?? []);
     res.status(200).send(result);
   } catch (error) {
     console.error(error);

@@ -24,6 +24,12 @@ export class PurchaseOrderItem {
   @Column({ type: 'json', nullable: false })
   quantities!: PharmacyQuantities;
 
+  @Column({ type: 'int', nullable: true })
+  orderQuantity!: number;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  targetStore?: string;
+
   @Column({ type: 'decimal', precision: 10, scale: 4 })
   unitPrice!: number;
 
